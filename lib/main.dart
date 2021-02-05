@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:skimscope/pages/admin_home.dart';
 import 'package:skimscope/pages/register.dart';
 
 import 'pages/login.dart';
@@ -28,6 +29,8 @@ class MyApp extends StatelessWidget {
             return CupertinoPageRoute(builder: (_) => LoginPage());
           case 'register':
             return CupertinoPageRoute(builder: (_) => RegisterPage());
+          case 'admin':
+            return CupertinoPageRoute(builder: (_) => AdminHomePage());
           default:
             return MaterialPageRoute(
                 builder: (_) => Scaffold(
