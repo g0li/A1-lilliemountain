@@ -2,8 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:skimscope/pages/admin_home.dart';
 import 'package:skimscope/pages/create_service.dart';
+import 'package:skimscope/pages/employee_home.dart';
 import 'package:skimscope/pages/equipment_detail.dart';
 import 'package:skimscope/pages/equipment_page.dart';
+import 'package:skimscope/pages/history.dart';
 import 'package:skimscope/pages/register.dart';
 
 import 'pages/employee.dart';
@@ -46,6 +48,10 @@ class MyApp extends StatelessWidget {
             return CupertinoPageRoute(builder: (_) => CreateEditServicePage());
           case 'employee':
             return CupertinoPageRoute(builder: (_) => EmployeePage());
+          case 'employeeH':
+            return CupertinoPageRoute(builder: (_) => EmployeeHomePage());
+          case 'history':
+            return CupertinoPageRoute(builder: (_) => HistoryPage());
           default:
             return MaterialPageRoute(
                 builder: (_) => Scaffold(

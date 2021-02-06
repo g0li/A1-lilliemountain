@@ -57,6 +57,17 @@ class LoginPage extends StatelessWidget {
                         Navigator.pushNamed(context, 'admin');
                       },
                     )),
+                Container(
+                    width: MediaQuery.of(context).size.width,
+                    padding: EdgeInsets.all(8),
+                    child: CupertinoButton(
+                      color: Theme.of(context).primaryColor,
+                      borderRadius: BorderRadius.circular(30),
+                      child: Text('Temp Sign In Employee'),
+                      onPressed: () {
+                        Navigator.pushNamed(context, 'employeeH');
+                      },
+                    )),
                 CupertinoButton(
                   onPressed: () {
                     Navigator.pushNamed(context, 'register');
