@@ -8,7 +8,7 @@ class EquipmentModel {
   final dynamic siteId;
   final String name;
   final String srNo;
-  final String installationDate;
+  final dynamic installationDate;
   final String createdBy;
   final dynamic whenCreated;
   final dynamic whenModified;
@@ -48,5 +48,18 @@ class EquipmentModel {
       isActive: data['isActive'],
       imageUrl: data['imageUrl'] ?? null,
     );
+  }
+
+  static Map<String, dynamic> equipmentModelToJSON(EquipmentModel eq) {
+    return {
+      'facilityId': FacilitesModel.facilityToJSon(eq.facilityId),
+      'siteId': SitesModel.siteModelToJSON(eq.siteId),
+      'name': eq.name,
+      'srNo': eq.srNo,
+      'installationDate': eq.installationDate,
+      'createdBy': eq.createdBy,
+      'isActive': eq.isActive,
+      'whenCreated': eq.whenCreated,
+    };
   }
 }

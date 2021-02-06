@@ -47,4 +47,14 @@ class FacilitesModel {
       whenModified: data['whenModified'] ?? null,
     );
   }
+
+  static Map<String, dynamic> facilityToJSon(FacilitesModel fac) {
+    return {
+      'name': fac.name,
+      'site': SitesModel.siteModelToJSON(fac.site),
+      'isActive': fac.isActive,
+      'whenCreated': fac.whenCreated,
+      'createdBy': fac.createdBy,
+    };
+  }
 }
