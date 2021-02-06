@@ -132,7 +132,7 @@ class _RegisterPageState extends State<RegisterPage> {
     hideShowLoader(true);
     String email = emailController.text.trim();
     String password = passwordController.text.trim();
-    String name = passwordController.text.trim();
+    String name = nameController.text.trim();
 
     String response = await authService.signup(
       context: context,
