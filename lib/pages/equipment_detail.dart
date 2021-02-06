@@ -33,6 +33,12 @@ class _EquipmentDetailPageState extends State<EquipmentDetailPage> {
             onPressed: () {
               // Navigator.pushNamed(context, 'employee');
             },
+          ),
+          IconButton(
+            icon: FaIcon(FontAwesomeIcons.qrcode),
+            onPressed: () {
+              // Navigator.pushNamed(context, 'employee');
+            },
           )
         ],
       ),
