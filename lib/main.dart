@@ -1,8 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:skimscope/pages/admin_home.dart';
+import 'package:skimscope/pages/create_service.dart';
+import 'package:skimscope/pages/equipment_detail.dart';
+import 'package:skimscope/pages/equipment_page.dart';
 import 'package:skimscope/pages/register.dart';
 
+import 'pages/employee.dart';
 import 'pages/login.dart';
 import 'pages/splash.dart';
 
@@ -31,6 +35,17 @@ class MyApp extends StatelessWidget {
             return CupertinoPageRoute(builder: (_) => RegisterPage());
           case 'admin':
             return CupertinoPageRoute(builder: (_) => AdminHomePage());
+          case 'equipment':
+            return CupertinoPageRoute(builder: (_) => EquipmentPage());
+          case 'edetails':
+            return CupertinoPageRoute(
+                builder: (_) => EquipmentDetailPage(
+                      equipment: settings.arguments,
+                    ));
+          case 'ceservice':
+            return CupertinoPageRoute(builder: (_) => CreateEditServicePage());
+          case 'employee':
+            return CupertinoPageRoute(builder: (_) => EmployeePage());
           default:
             return MaterialPageRoute(
                 builder: (_) => Scaffold(

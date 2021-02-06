@@ -11,6 +11,14 @@ class AdminHomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Skimscope'),
+        actions: [
+          IconButton(
+            icon: FaIcon(FontAwesomeIcons.hardHat),
+            onPressed: () {
+              Navigator.pushNamed(context, 'employee');
+            },
+          )
+        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -214,6 +222,9 @@ class AdminHomePage extends StatelessWidget {
                         );
                       else
                         return ListTile(
+                          onTap: () {
+                            Navigator.pushNamed(context, 'equipment');
+                          },
                           title: Text(
                             'facility $i',
                             style: GoogleFonts.roboto().copyWith(
