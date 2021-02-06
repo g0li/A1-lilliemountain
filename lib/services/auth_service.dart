@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
@@ -124,6 +125,91 @@ class AuthService {
       var userProvider = Provider.of<UserProvider>(context, listen: false);
       userProvider.user = null;
       await firebaseAuth.signOut();
+    }
+  }
+
+  // create employee account
+  Future<String> createEmployeeAccount({
+    @required String email,
+    @required String password,
+    @required String name,
+    @required DateTime joiningDate,
+  }) async {
+    try {
+      final httpsCallable = FirebaseFunctions.instanceFor(region: 'asia-east2')
+          .httpsCallable('addEmployeeAccount');
+      dynamic res = await httpsCallable.call(<String, dynamic>{
+        'email': email.trim(),
+        'password': password.trim(),
+        'name': name.trim(),
+        'joiningDate': joiningDate
+      });
+
+      var result = res.data;
+      print(result.toString());
+
+      if (result['status'] == 1) {
+        return 'User creation successful';
+      } else {
+        return 'Some error occured, Please try again later';
+      }
+    } catch (err) {
+      print('Error creating employee account: ${err.toString()}');
+      return 'Some error occured, Please try again later';
+    }
+  }
+
+  // change employee password
+  Future<bool> changeEmployeePassword({
+    @required String userId,
+    @required String password,
+  }) async {
+    try {
+      final httpsCallable = FirebaseFunctions.instanceFor(region: 'asia-east2')
+          .httpsCallable('changeEmpPassword');
+      dynamic res = await httpsCallable.call(<String, dynamic>{
+        'userId': userId,
+        'password': password.trim(),
+      });
+
+      var result = res.data;
+      print(result.toString());
+
+      if (result['status'] == 1) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (err) {
+      print('Error in change password: ${err.toString()}');
+      return false;
+    }
+  }
+
+  // modify employee account (change status to active / inactive)
+  Future<bool> modifyEmployeeAccount({
+    @required bool isActive,
+    @required String userId,
+  }) async {
+    try {
+      final httpsCallable = FirebaseFunctions.instanceFor(region: 'asia-east2')
+          .httpsCallable('modifyUser');
+      dynamic res = await httpsCallable.call(<String, dynamic>{
+        'userId': userId,
+        'isActive': isActive,
+      });
+
+      var result = res.data;
+      print(result.toString());
+
+      if (result['status'] == 1) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (err) {
+      print('Error in modify Employee account: ${err.toString()}');
+      return false;
     }
   }
 }
