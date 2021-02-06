@@ -1,3 +1,4 @@
+import { admin } from 'firebase-admin/lib/auth';
 import * as functions from 'firebase-functions';
 // import * as admin from 'firebase-admin';
 
@@ -6,6 +7,8 @@ import {
     changeEmployeePassword,
     modifyUserStatus,
 } from './employee-creation';
+
+import { onAdminRegistration } from './admin-creation';
 
 // Add employee account
 export const addEmployeeAccount = functions
@@ -27,3 +30,8 @@ export const modifyUser = functions
     .https.onCall((data, context) => {
         return modifyUserStatus(data, context);
     });
+
+
+export const onCreateAdmin = functions.region('asia-east2').auth.user().onCreate((user: admin.auth.UserRecord, context: any) => {
+    return onAdminRegistration(user, context);
+});
