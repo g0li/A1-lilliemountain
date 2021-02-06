@@ -5,7 +5,7 @@ class UserModel {
   final String role;
   final String name;
   final String email;
-  final DateTime joiningDate;
+  final dynamic joiningDate;
   final bool isActive;
   final Timestamp whenCreated;
   final dynamic whenModified;

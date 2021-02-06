@@ -43,4 +43,17 @@ class ServicesModel {
       whenModified: data['whenModified'] ?? null,
     );
   }
+
+  static Map<String, dynamic> servicesToJSON(ServicesModel service) {
+    return {
+      'equipmentId': service.id,
+      'title': service.title,
+      'startDate': service.startDate,
+      'endDate': service.endDate,
+      'facility': service.facility,
+      'createdBy': service.createdBy,
+      'notes': service.notes,
+      'whenCreated': service.whenCreated,
+    };
+  }
 }
