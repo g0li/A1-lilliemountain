@@ -1,7 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:skimscope/model/user_model.dart';
+import 'package:skimscope/providers/user_provider.dart';
 
 class AuthService {
   final db = FirebaseFirestore.instance;
@@ -12,6 +15,7 @@ class AuthService {
     @required String emailAddress,
     @required String userPassword,
     @required String name,
+    @required BuildContext context,
   }) async {
     try {
       final email = emailAddress.trim().toLowerCase();
@@ -21,16 +25,34 @@ class AuthService {
       final res = await firebaseAuth.createUserWithEmailAndPassword(
           email: email, password: password);
 
+      var currentDateTime = Timestamp.now().toDate();
+      var currentTimestamp = Timestamp.now();
+
       // save user data to firestore
       await db.doc('users/${res.user.uid}').set({
         'id': res.user.uid,
         'email': email,
         'name': name,
-        'joiningDate': Timestamp.now(),
-        'whenCreated': Timestamp.now(),
+        'joiningDate': currentDateTime,
+        'whenCreated': currentTimestamp,
         'isActive': true,
         'role': 'Admin',
       });
+
+      UserModel user = UserModel(
+        email: email,
+        id: res.user.uid,
+        name: name,
+        joiningDate: currentDateTime,
+        isActive: true,
+        role: 'Admin',
+        whenCreated: currentTimestamp,
+        whenModified: null,
+      );
+
+      // save current user in user provider
+      var userProvider = Provider.of<UserProvider>(context, listen: false);
+      userProvider.user = user;
 
       return 'Signup Successful';
     } on PlatformException catch (err) {
@@ -50,6 +72,7 @@ class AuthService {
   Future<String> login({
     @required String userEmail,
     @required String userPassword,
+    @required BuildContext context,
     String type = 'Employee',
   }) async {
     try {
@@ -61,6 +84,20 @@ class AuthService {
           email: email, password: password);
 
       // get user claims
+      var claims = await firebaseAuth.currentUser.getIdTokenResult();
+      if (claims.claims['isActive'] == false) {
+        return 'Unauthorized';
+      }
+
+      // save user data to provider
+      if (user != null) {
+        var docSnapshot = await db.doc('users/${user.user.uid}').get();
+        if (docSnapshot.exists && docSnapshot.data() != null) {
+          UserModel userModel = UserModel.fromFirestore(docSnapshot);
+          var userProvider = Provider.of<UserProvider>(context, listen: false);
+          userProvider.user = userModel;
+        }
+      }
 
       print('Login success: ${user.toString()}');
       return 'Login Successful';
@@ -76,7 +113,17 @@ class AuthService {
   }
 
   // signout
-  signout() async {
-    await firebaseAuth.signOut();
+  signout({@required BuildContext context}) async {
+    try {
+      var userProvider = Provider.of<UserProvider>(context, listen: false);
+      userProvider.user = null;
+      await firebaseAuth.signOut();
+    } catch (err) {
+      print(err.toString());
+      await firebaseAuth.signOut();
+      var userProvider = Provider.of<UserProvider>(context, listen: false);
+      userProvider.user = null;
+      await firebaseAuth.signOut();
+    }
   }
 }
