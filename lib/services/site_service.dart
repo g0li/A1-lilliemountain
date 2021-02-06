@@ -44,4 +44,17 @@ class SiteService {
       return false;
     }
   }
+
+  // get all Sites
+  Stream<List<SitesModel>> getAllSites() {
+    try {
+      var siteRef = db.collection('sites').snapshots();
+      var list = siteRef.map(
+          (d) => d.docs.map((doc) => SitesModel.fromFirestore(doc)).toList());
+      return list;
+    } catch (err) {
+      print(err.toString());
+      return null;
+    }
+  }
 }

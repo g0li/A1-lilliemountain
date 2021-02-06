@@ -47,4 +47,17 @@ class FacilityService {
       return false;
     }
   }
+
+  // get all facilities
+  Stream<List<FacilitesModel>> getAllFacilities() {
+    try {
+      var facilitiesRef = db.collection('facilities').snapshots();
+      var list = facilitiesRef.map((d) =>
+          d.docs.map((doc) => FacilitesModel.fromFirestore(doc)).toList());
+      return list;
+    } catch (err) {
+      print(err.toString());
+      return null;
+    }
+  }
 }

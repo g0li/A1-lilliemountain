@@ -70,4 +70,17 @@ class EquipmentService {
       return false;
     }
   }
+
+  // get all equipments
+  Stream<List<EquipmentModel>> getAllEquipments() {
+    try {
+      var equipmentRef = db.collection('equipments').snapshots();
+      var list = equipmentRef.map((d) =>
+          d.docs.map((doc) => EquipmentModel.fromFirestore(doc)).toList());
+      return list;
+    } catch (err) {
+      print(err.toString());
+      return null;
+    }
+  }
 }
