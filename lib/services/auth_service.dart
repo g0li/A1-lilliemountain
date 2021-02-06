@@ -212,4 +212,34 @@ class AuthService {
       return false;
     }
   }
+
+  // Get all users
+  Stream<List<UserModel>> getAllEmployees() {
+    try {
+      var empRef = db
+          .collection('users')
+          .where('role', isEqualTo: 'Employee')
+          .snapshots();
+      var list = empRef.map(
+          (d) => d.docs.map((doc) => UserModel.fromFirestore(doc)).toList());
+      return list;
+    } catch (err) {
+      print(err.toString());
+      return null;
+    }
+  }
+
+  // Get all admins
+  Stream<List<UserModel>> getAllAdmins() {
+    try {
+      var adminRef =
+          db.collection('users').where('role', isEqualTo: 'Admin').snapshots();
+      var list = adminRef.map(
+          (d) => d.docs.map((doc) => UserModel.fromFirestore(doc)).toList());
+      return list;
+    } catch (err) {
+      print(err.toString());
+      return null;
+    }
+  }
 }
