@@ -57,11 +57,13 @@ class AuthService {
 
       return 'Signup Successful';
     } on PlatformException catch (err) {
-      print('Error in signup: ${err.message}');
-      return err.message;
+      var message = 'Some error occured, please try agian later';
+      if (err != null && err.message != null) {
+        message = err.message;
+      }
+      return message;
     } catch (err) {
-      print('Error in signup: ${err.toString()}');
-      var message = 'Some error occured, please try again later';
+      var message = 'Some error occured, please try agian later';
       if (err != null && err.message != null) {
         message = err.message;
       }
@@ -74,7 +76,6 @@ class AuthService {
     @required String userEmail,
     @required String userPassword,
     @required BuildContext context,
-    String type = 'Employee',
   }) async {
     try {
       final email = userEmail.trim().toLowerCase();
@@ -103,8 +104,14 @@ class AuthService {
       print('Login success: ${user.toString()}');
       return 'Login Successful';
     } on PlatformException catch (err) {
-      return err.message ?? 'Some error occured, Please try again later';
+      print(err.toString());
+      var message = 'Some error occured, please try agian later';
+      if (err != null && err.message != null) {
+        message = err.message;
+      }
+      return message;
     } catch (err) {
+      print(err.toString());
       var message = 'Some error occured, please try agian later';
       if (err != null && err.message != null) {
         message = err.message;
