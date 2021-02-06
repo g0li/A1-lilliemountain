@@ -107,102 +107,110 @@ class AdminHomePage extends StatelessWidget {
                         width: MediaQuery.of(context).size.width,
                         child: ListView.builder(
                             primary: false,
+                            shrinkWrap: true,
                             scrollDirection: Axis.horizontal,
                             itemCount: 3 + 1,
                             itemBuilder: (context, i) {
                               if (i == 3)
-                                return Container(
-                                  margin: const EdgeInsets.all(4.0),
-                                  child: Material(
-                                    color: Colors.grey,
-                                    borderRadius: BorderRadius.circular(20),
-                                    child: InkWell(
-                                        onTap: () {
-                                          showModalBottomSheet(
-                                            context: context,
-                                            builder: (context) {
-                                              return Scaffold(
-                                                appBar: AppBar(
-                                                  title: Text('New site'),
-                                                ),
-                                                body: Form(
-                                                  child: Padding(
-                                                    padding: const EdgeInsets
-                                                            .symmetric(
-                                                        horizontal: 28.0,
-                                                        vertical: 16),
-                                                    child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Padding(
-                                                            padding:
-                                                                EdgeInsets.all(
-                                                                    8),
-                                                            child:
-                                                                TextFormField(
-                                                                    keyboardType:
-                                                                        TextInputType
-                                                                            .text,
-                                                                    decoration:
-                                                                        InputDecoration(
-                                                                      labelText:
-                                                                          'site name',
-                                                                      border: OutlineInputBorder(
-                                                                          borderRadius: BorderRadius.circular(
-                                                                              10),
-                                                                          borderSide: BorderSide(
-                                                                              color: Colors.black,
-                                                                              width: 2)),
-                                                                    )),
-                                                          ),
-                                                          Container(
-                                                              width:
-                                                                  MediaQuery.of(
+                                return Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Material(
+                                        color: Colors.grey,
+                                        borderRadius: BorderRadius.circular(20),
+                                        child: InkWell(
+                                            onTap: () {
+                                              showModalBottomSheet(
+                                                context: context,
+                                                builder: (context) {
+                                                  return Scaffold(
+                                                    appBar: AppBar(
+                                                      title: Text('New site'),
+                                                    ),
+                                                    body: Form(
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .symmetric(
+                                                                horizontal:
+                                                                    28.0,
+                                                                vertical: 16),
+                                                        child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .center,
+                                                            children: [
+                                                              Padding(
+                                                                padding:
+                                                                    EdgeInsets
+                                                                        .all(8),
+                                                                child:
+                                                                    TextFormField(
+                                                                        keyboardType:
+                                                                            TextInputType
+                                                                                .text,
+                                                                        decoration:
+                                                                            InputDecoration(
+                                                                          labelText:
+                                                                              'site name',
+                                                                          border: OutlineInputBorder(
+                                                                              borderRadius: BorderRadius.circular(10),
+                                                                              borderSide: BorderSide(color: Colors.black, width: 2)),
+                                                                        )),
+                                                              ),
+                                                              Container(
+                                                                  width: MediaQuery.of(
                                                                           context)
                                                                       .size
                                                                       .width,
-                                                              padding:
-                                                                  EdgeInsets
-                                                                      .all(8),
-                                                              child:
-                                                                  CupertinoButton(
-                                                                color: Theme.of(
-                                                                        context)
-                                                                    .primaryColor,
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
+                                                                  padding:
+                                                                      EdgeInsets
+                                                                          .all(
+                                                                              8),
+                                                                  child:
+                                                                      CupertinoButton(
+                                                                    color: Theme.of(
+                                                                            context)
+                                                                        .primaryColor,
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
                                                                             30),
-                                                                child: Text(
-                                                                    'Create'),
-                                                                onPressed: () {
-                                                                  Navigator.pop(
-                                                                      context);
-                                                                },
-                                                              )),
-                                                        ]),
-                                                  ),
-                                                ),
+                                                                    child: Text(
+                                                                        'Create'),
+                                                                    onPressed:
+                                                                        () {
+                                                                      Navigator.pop(
+                                                                          context);
+                                                                    },
+                                                                  )),
+                                                            ]),
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
                                               );
                                             },
-                                          );
-                                        },
-                                        borderRadius: BorderRadius.circular(20),
-                                        child: SizedBox(
-                                          height: 80,
-                                          width: 80,
-                                          child: Container(
-                                            alignment: Alignment.center,
-                                            child: Text(
-                                              '+ ',
-                                              style: GoogleFonts.roboto(
-                                                  fontSize: 40,
-                                                  color: Colors.white),
-                                            ),
-                                          ),
-                                        )),
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                            child: SizedBox(
+                                              height: 80,
+                                              width: 80,
+                                              child: Container(
+                                                alignment: Alignment.center,
+                                                child: Text(
+                                                  '+ ',
+                                                  textAlign: TextAlign.center,
+                                                  style: GoogleFonts.roboto(
+                                                      fontSize: 40,
+                                                      color: Colors.white),
+                                                ),
+                                              ),
+                                            )),
+                                      ),
+                                    ],
                                   ),
                                 );
                               else
