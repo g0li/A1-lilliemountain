@@ -36,8 +36,10 @@ class _SiteWidgetState extends State<SiteWidget> {
                     alignment: Alignment.center,
                     child: Text(
                       widget.siteName[0],
-                      style:
-                          GoogleFonts.roboto(fontSize: 40, color: Colors.black),
+                      style: GoogleFonts.roboto(
+                          fontSize: 40,
+                          color:
+                              !widget.isActive ? Colors.black : Colors.white),
                     ),
                   ),
                 )),
