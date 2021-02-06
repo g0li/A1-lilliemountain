@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "814922751909",
+    "project_id": "skimscope",
+    "storage_bucket": "skimscope.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:814922751909:android:e134b19f3de0362d38124c",
+        "android_client_info": {
+          "package_name": "com.example.skimscope"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "814922751909-u5gc3pkb4gguhl42v8afle1sod8v7khn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC1cXxS-Qy1SpWi9UIR3QunabS1odXZ77s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "814922751909-u5gc3pkb4gguhl42v8afle1sod8v7khn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
