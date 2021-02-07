@@ -29,7 +29,6 @@ class _EquipmentDetailPageState extends State<EquipmentDetailPage>
   bool isLive = true;
   var pc = PageController(initialPage: 0);
   GlobalKey<ScaffoldState> edKey = GlobalKey<ScaffoldState>();
-
   @override
   Widget build(BuildContext context) {
     var userProvider = Provider.of<UserProvider>(context);
@@ -38,36 +37,41 @@ class _EquipmentDetailPageState extends State<EquipmentDetailPage>
       appBar: AppBar(
         title: Text('${widget.equipment.name}'),
         actions: [
-          StreamBuilder<bool>(
-              stream: EquipmentService().wathchIsActive(widget.equipment.id),
-              builder: (context, snapshot) {
-                if (snapshot.hasError) return Container();
-                switch (snapshot.connectionState) {
-                  case ConnectionState.waiting:
-                    return CircularProgressIndicator();
+          userProvider.user.role == 'Admin'
+              ? StreamBuilder<bool>(
+                  stream:
+                      EquipmentService().wathchIsActive(widget.equipment.id),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) return Container();
+                    switch (snapshot.connectionState) {
+                      case ConnectionState.waiting:
+                        return CircularProgressIndicator();
 
-                    break;
-                  default:
-                    return CupertinoSwitch(
-                        value: snapshot.data,
-                        onChanged: (_) {
-                          String added = _ ? ' activated' : ' deactivated';
-                          EquipmentService()
-                              .toggleEquipment(_, widget.equipment.id)
-                              .then((value) {
-                            edKey.currentState.hideCurrentSnackBar();
-                            edKey.currentState.showSnackBar(SnackBar(
-                              content: Text('${widget.equipment.name} $added',
-                                  style: GoogleFonts.roboto().copyWith(
-                                      color: _ ? Colors.green : Colors.red)),
-                              backgroundColor: _
-                                  ? Colors.lightGreen.shade100
-                                  : Colors.red.shade100,
-                            ));
-                          });
-                        });
-                }
-              }),
+                        break;
+                      default:
+                        return CupertinoSwitch(
+                            value: snapshot.data,
+                            onChanged: (_) {
+                              String added = _ ? ' activated' : ' deactivated';
+                              EquipmentService()
+                                  .toggleEquipment(_, widget.equipment.id)
+                                  .then((value) {
+                                edKey.currentState.hideCurrentSnackBar();
+                                edKey.currentState.showSnackBar(SnackBar(
+                                  content: Text(
+                                      '${widget.equipment.name} $added',
+                                      style: GoogleFonts.roboto().copyWith(
+                                          color:
+                                              _ ? Colors.green : Colors.red)),
+                                  backgroundColor: _
+                                      ? Colors.lightGreen.shade100
+                                      : Colors.red.shade100,
+                                ));
+                              });
+                            });
+                    }
+                  })
+              : Container(),
           IconButton(
             icon: FaIcon(FontAwesomeIcons.home),
             onPressed: () {
@@ -76,13 +80,15 @@ class _EquipmentDetailPageState extends State<EquipmentDetailPage>
                   (route) => false);
             },
           ),
-          IconButton(
-            icon: FaIcon(FontAwesomeIcons.qrcode),
-            onPressed: () {
-              // Navigator.pushNamed(context, 'employee');
-              generateQRCODE(widget.equipment);
-            },
-          )
+          userProvider.user.role == 'Admin'
+              ? IconButton(
+                  icon: FaIcon(FontAwesomeIcons.qrcode),
+                  onPressed: () {
+                    // Navigator.pushNamed(context, 'employee');
+                    generateQRCODE(widget.equipment);
+                  },
+                )
+              : Container()
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -142,9 +148,11 @@ class _EquipmentDetailPageState extends State<EquipmentDetailPage>
                           color: Colors.black,
                           fontSize: 16,
                           fontWeight: FontWeight.w500)),
-                  IconButton(
-                      icon: FaIcon(FontAwesomeIcons.solidEdit),
-                      onPressed: () {})
+                  userProvider.user.role == 'Admin'
+                      ? IconButton(
+                          icon: FaIcon(FontAwesomeIcons.solidEdit),
+                          onPressed: () {})
+                      : Container()
                 ],
               ),
               Text(
