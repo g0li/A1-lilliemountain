@@ -9,6 +9,7 @@ import 'package:skimscope/model/equipment_model.dart';
 import 'package:skimscope/model/facilities_model.dart';
 import 'package:skimscope/model/services_model.dart';
 import 'package:skimscope/providers/user_provider.dart';
+import 'package:skimscope/services/equipment_service.dart';
 import 'package:skimscope/services/facility_service.dart';
 import 'package:skimscope/services/maintenance_service.dart';
 
@@ -231,19 +232,43 @@ class CreateEditServicePage extends StatelessWidget {
                                 BorderSide(color: Colors.black, width: 2)),
                       )),
                 ),
-                Padding(
-                  padding: EdgeInsets.all(8),
-                  child: TextFormField(
-                      enabled: false,
-                      keyboardType: TextInputType.text,
-                      decoration: InputDecoration(
-                        labelText: servicesModel.equipmentName,
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide:
-                                BorderSide(color: Colors.black, width: 2)),
-                      )),
-                ),
+                StreamBuilder<EquipmentModel>(
+                    stream: EquipmentService()
+                        .getEquipment(servicesModel.equipmentId),
+                    builder: (context, snapshots) {
+                      switch (snapshots.connectionState) {
+                        case ConnectionState.waiting:
+                          return Padding(
+                            padding: EdgeInsets.all(8),
+                            child: TextFormField(
+                                enabled: false,
+                                keyboardType: TextInputType.text,
+                                decoration: InputDecoration(
+                                  labelText: servicesModel.equipmentName,
+                                  border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: BorderSide(
+                                          color: Colors.black, width: 2)),
+                                )),
+                          );
+                          break;
+                        default:
+                          return Padding(
+                            padding: EdgeInsets.all(8),
+                            child: TextFormField(
+                                enabled: false,
+                                keyboardType: TextInputType.text,
+                                decoration: InputDecoration(
+                                  labelText: snapshots.data.name,
+                                  border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: BorderSide(
+                                          color: Colors.black, width: 2)),
+                                )),
+                          );
+                      }
+                      ;
+                    }),
                 Padding(
                   padding: EdgeInsets.all(8),
                   child: TextFormField(
