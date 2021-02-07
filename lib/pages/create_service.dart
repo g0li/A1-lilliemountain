@@ -301,8 +301,7 @@ class CreateEditServicePage extends StatelessWidget {
                                   startDate: servicesModel.startDate,
                                   endDate: null,
                                   facility: servicesModel.facility,
-                                  createdBy:
-                                      FirebaseAuth.instance.currentUser.uid,
+                                  createdBy: servicesModel.createdBy,
                                   notes: notes.text)
                               .then((value) {
                             Navigator.pop(context);

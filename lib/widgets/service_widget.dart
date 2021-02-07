@@ -14,7 +14,8 @@ import 'package:skimscope/services/maintenance_service.dart';
 class ServiceWidget extends StatelessWidget {
   ServicesModel servicesModel;
   GlobalKey<ScaffoldState> globalKey;
-  ServiceWidget({this.servicesModel, this.globalKey});
+  String createdBy;
+  ServiceWidget({this.servicesModel, this.createdBy, this.globalKey});
   @override
   Widget build(BuildContext context) {
     return Container(

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:encrypt/encrypt_io.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -103,6 +104,7 @@ class _EquipmentDetailPageState extends State<EquipmentDetailPage>
         ),
       ),
       body: SingleChildScrollView(
+        controller: ScrollController(debugLabel: 'sclv'),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
           child: Column(
@@ -214,11 +216,22 @@ class _EquipmentDetailPageState extends State<EquipmentDetailPage>
                         );
                         break;
                       default:
-                        List<ServicesModel> history = snapshot.data;
-                        List<ServicesModel> live = snapshot.data
+                        List<ServicesModel> history = [];
+                        // List<ServicesModel> history = snapshot.data;
+                        if (userProvider.user.role == 'Admin')
+                          history = snapshot.data;
+                        else {
+                          history.clear();
+                          for (var item in snapshot.data) {
+                            if (item.createdBy ==
+                                FirebaseAuth.instance.currentUser.uid)
+                              history.add(item);
+                          }
+                        }
+                        List<ServicesModel> live = history
                             .where((element) => element.endDate == null)
                             .toList();
-                        List<ServicesModel> closed = snapshot.data
+                        List<ServicesModel> closed = history
                             .where((element) => element.endDate != null)
                             .toList();
                         if (history.length > 0) {
@@ -269,7 +282,23 @@ class _EquipmentDetailPageState extends State<EquipmentDetailPage>
                             ),
                           );
                         } else {
-                          return Container();
+                          return Container(
+                              height: 300,
+                              child: PageView(
+                                controller: pc,
+                                children: [
+                                  Align(
+                                    alignment: Alignment.topLeft,
+                                    child: Text(
+                                        'No Live Services for ${widget.equipment.name}'),
+                                  ),
+                                  Align(
+                                    alignment: Alignment.topLeft,
+                                    child: Text(
+                                        'No Closed Services for ${widget.equipment.name}'),
+                                  ),
+                                ],
+                              ));
                         }
                     }
                   })
