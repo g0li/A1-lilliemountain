@@ -4,9 +4,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:skimscope/model/equipment_model.dart';
 import 'package:skimscope/model/facilities_model.dart';
 import 'package:skimscope/model/services_model.dart';
+import 'package:skimscope/providers/user_provider.dart';
 import 'package:skimscope/services/facility_service.dart';
 import 'package:skimscope/services/maintenance_service.dart';
 
@@ -27,6 +29,7 @@ class CreateEditServicePage extends StatelessWidget {
   GlobalKey<ScaffoldState> cesKey = GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
+    var userProvider = Provider.of<UserProvider>(context, listen: false);
     if (equipment != null)
       return Scaffold(
         key: cesKey,
@@ -36,7 +39,9 @@ class CreateEditServicePage extends StatelessWidget {
             IconButton(
               icon: FaIcon(FontAwesomeIcons.home),
               onPressed: () {
-                // Navigator.pushNamed(context, 'employee');
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                    userProvider.user.role == 'Admin' ? 'admin' : 'employeeH',
+                    (route) => false);
               },
             )
           ],
@@ -185,7 +190,9 @@ class CreateEditServicePage extends StatelessWidget {
             IconButton(
               icon: FaIcon(FontAwesomeIcons.home),
               onPressed: () {
-                // Navigator.pushNamed(context, 'employee');
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                    userProvider.user.role == 'Admin' ? 'admin' : 'employeeH',
+                    (route) => false);
               },
             )
           ],

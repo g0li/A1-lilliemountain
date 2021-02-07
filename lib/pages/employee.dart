@@ -12,8 +12,6 @@ import 'package:skimscope/widgets/api_loader.dart';
 import 'package:skimscope/widgets/employee_widget.dart';
 import 'package:skimscope/widgets/input_formfield_widget.dart';
 import 'package:skimscope/widgets/picker.dart';
-import 'package:provider/provider.dart';
-import '../providers/user_provider.dart';
 
 class EmployeePage extends StatefulWidget {
   @override

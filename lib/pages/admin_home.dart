@@ -27,248 +27,255 @@ class _AdminHomePageState extends State<AdminHomePage> {
   @override
   Widget build(BuildContext context) {
     provider = Provider.of<SiteProvider>(context);
-    return Scaffold(
-      key: adminKey,
-      appBar: AppBar(
-        title: Text('Skimscope'),
-        actions: [
-          IconButton(
-            icon: FaIcon(FontAwesomeIcons.hardHat),
-            onPressed: () {
-              Navigator.pushNamed(context, 'employee');
-            },
-          )
-        ],
-      ),
-      body: SingleChildScrollView(
-          child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Sites',
-              style: GoogleFonts.roboto().copyWith(
-                  fontWeight: FontWeight.w900,
-                  color: Theme.of(context).primaryColor,
-                  fontSize: 24),
-            ),
-            (provider.allSites.length < 1)
-                ? Container(
-                    height: 120,
-                    margin: EdgeInsets.symmetric(vertical: 8),
-                    width: MediaQuery.of(context).size.width,
-                    child: ListView.builder(
-                        primary: false,
-                        shrinkWrap: true,
-                        scrollDirection: Axis.horizontal,
-                        itemCount: 5,
-                        itemBuilder: (context, i) {
-                          return Shimmer.fromColors(
-                            baseColor: Colors.grey.shade300,
-                            highlightColor: Colors.grey.shade50,
-                            child: Column(
-                              children: [
-                                Container(
-                                  margin: const EdgeInsets.all(4.0),
-                                  child: Material(
-                                    color: Color(0xFFF28F3B),
-                                    borderRadius: BorderRadius.circular(20),
-                                    child: InkWell(
-                                        onTap: () {},
-                                        borderRadius: BorderRadius.circular(20),
-                                        child: SizedBox(
-                                          height: 80,
-                                          width: 80,
-                                          child: Container(
-                                            alignment: Alignment.center,
-                                            child: Text(
-                                              '',
-                                              style: GoogleFonts.roboto(
-                                                  fontSize: 40,
-                                                  color: Colors.white),
-                                            ),
-                                          ),
-                                        )),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        }),
-                  )
-                : Container(
-                    height: 120,
-                    margin: EdgeInsets.symmetric(vertical: 8),
-                    width: MediaQuery.of(context).size.width,
-                    child: ListView.builder(
-                        primary: false,
-                        shrinkWrap: true,
-                        scrollDirection: Axis.horizontal,
-                        itemCount: provider.allSites.length + 1,
-                        itemBuilder: (context, i) {
-                          if (i == provider.allSites.length)
-                            return Padding(
-                              padding: const EdgeInsets.all(8.0),
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        key: adminKey,
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          title: Text('Skimscope'),
+          actions: [
+            IconButton(
+              icon: FaIcon(FontAwesomeIcons.hardHat),
+              onPressed: () {
+                Navigator.pushNamed(context, 'employee');
+              },
+            )
+          ],
+        ),
+        body: SingleChildScrollView(
+            child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Sites',
+                style: GoogleFonts.roboto().copyWith(
+                    fontWeight: FontWeight.w900,
+                    color: Theme.of(context).primaryColor,
+                    fontSize: 24),
+              ),
+              (provider.allSites.length < 1)
+                  ? Container(
+                      height: 120,
+                      margin: EdgeInsets.symmetric(vertical: 8),
+                      width: MediaQuery.of(context).size.width,
+                      child: ListView.builder(
+                          primary: false,
+                          shrinkWrap: true,
+                          scrollDirection: Axis.horizontal,
+                          itemCount: 5,
+                          itemBuilder: (context, i) {
+                            return Shimmer.fromColors(
+                              baseColor: Colors.grey.shade300,
+                              highlightColor: Colors.grey.shade50,
                               child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  Material(
-                                    color: Colors.grey,
-                                    borderRadius: BorderRadius.circular(20),
-                                    child: InkWell(
-                                        onTap: () {
-                                          newSite(context);
-                                        },
-                                        borderRadius: BorderRadius.circular(20),
-                                        child: SizedBox(
-                                          height: 80,
-                                          width: 80,
-                                          child: Container(
-                                            alignment: Alignment.center,
-                                            child: Text(
-                                              '+ ',
-                                              textAlign: TextAlign.center,
-                                              style: GoogleFonts.roboto(
-                                                  fontSize: 40,
-                                                  color: Colors.white),
+                                  Container(
+                                    margin: const EdgeInsets.all(4.0),
+                                    child: Material(
+                                      color: Color(0xFFF28F3B),
+                                      borderRadius: BorderRadius.circular(20),
+                                      child: InkWell(
+                                          onTap: () {},
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                          child: SizedBox(
+                                            height: 80,
+                                            width: 80,
+                                            child: Container(
+                                              alignment: Alignment.center,
+                                              child: Text(
+                                                '',
+                                                style: GoogleFonts.roboto(
+                                                    fontSize: 40,
+                                                    color: Colors.white),
+                                              ),
                                             ),
-                                          ),
-                                        )),
+                                          )),
+                                    ),
                                   ),
                                 ],
                               ),
                             );
-                          else
-                            return SiteWidget(
-                                site: provider.allSites[i],
-                                onTap: (cs) {
-                                  setState(() {
-                                    currentSite = cs;
-                                  });
-                                });
-                        }),
-                  ),
-            Text(
-              'Facilities',
-              style: GoogleFonts.roboto().copyWith(
-                  fontWeight: FontWeight.w900,
-                  color: Theme.of(context).primaryColor,
-                  fontSize: 24),
-            ),
-            StreamBuilder<List<FacilitesModel>>(
-                stream: FacilityService().getAllFacilities(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasError) return Text('Something went wrong');
-                  switch (snapshot.connectionState) {
-                    case ConnectionState.waiting:
-                      return Container(
-                        height: 120,
-                        margin: EdgeInsets.symmetric(vertical: 8),
-                        width: MediaQuery.of(context).size.width,
-                        child: ListView.builder(
-                            primary: false,
-                            shrinkWrap: true,
-                            scrollDirection: Axis.horizontal,
-                            itemCount: 5,
-                            itemBuilder: (context, i) {
-                              return Shimmer.fromColors(
-                                baseColor: Colors.grey.shade300,
-                                highlightColor: Colors.grey.shade50,
-                                child: Container(
-                                  width: MediaQuery.of(context).size.width,
-                                  height: 100,
+                          }),
+                    )
+                  : Container(
+                      height: 120,
+                      margin: EdgeInsets.symmetric(vertical: 8),
+                      width: MediaQuery.of(context).size.width,
+                      child: ListView.builder(
+                          primary: false,
+                          shrinkWrap: true,
+                          scrollDirection: Axis.horizontal,
+                          itemCount: provider.allSites.length + 1,
+                          itemBuilder: (context, i) {
+                            if (i == provider.allSites.length)
+                              return Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Material(
+                                      color: Colors.grey,
+                                      borderRadius: BorderRadius.circular(20),
+                                      child: InkWell(
+                                          onTap: () {
+                                            newSite(context);
+                                          },
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                          child: SizedBox(
+                                            height: 80,
+                                            width: 80,
+                                            child: Container(
+                                              alignment: Alignment.center,
+                                              child: Text(
+                                                '+ ',
+                                                textAlign: TextAlign.center,
+                                                style: GoogleFonts.roboto(
+                                                    fontSize: 40,
+                                                    color: Colors.white),
+                                              ),
+                                            ),
+                                          )),
+                                    ),
+                                  ],
                                 ),
                               );
-                            }),
-                      );
-                    default:
-                      List<FacilitesModel> facilities = snapshot.data;
-                      List<FacilitesModel> currentSiteData = [];
-                      for (var item in facilities) {
-                        if (currentSite != null) if (item.site.name
-                            .contains(currentSite.name))
-                          currentSiteData.add(item);
-                      }
-                      return Container(
-                        height: 700,
-                        child: ListView.builder(
-                            primary: false,
-                            itemCount: currentSiteData.length + 1,
-                            itemBuilder: (context, i) {
-                              if (i == currentSiteData.length)
-                                return ListTile(
-                                  onTap: () {
-                                    newFacility(context);
-                                  },
-                                  title: Text(
-                                    'new facility',
-                                    style: GoogleFonts.roboto().copyWith(
-                                        color: Theme.of(context).primaryColor,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600),
-                                  ),
-                                  trailing: FaIcon(
-                                    FontAwesomeIcons.plus,
-                                    color: Theme.of(context).primaryColor,
+                            else
+                              return SiteWidget(
+                                  site: provider.allSites[i],
+                                  onTap: (cs) {
+                                    setState(() {
+                                      currentSite = cs;
+                                    });
+                                  });
+                          }),
+                    ),
+              Text(
+                'Facilities',
+                style: GoogleFonts.roboto().copyWith(
+                    fontWeight: FontWeight.w900,
+                    color: Theme.of(context).primaryColor,
+                    fontSize: 24),
+              ),
+              StreamBuilder<List<FacilitesModel>>(
+                  stream: FacilityService().getAllFacilities(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) return Text('Something went wrong');
+                    switch (snapshot.connectionState) {
+                      case ConnectionState.waiting:
+                        return Container(
+                          height: 120,
+                          margin: EdgeInsets.symmetric(vertical: 8),
+                          width: MediaQuery.of(context).size.width,
+                          child: ListView.builder(
+                              primary: false,
+                              shrinkWrap: true,
+                              scrollDirection: Axis.horizontal,
+                              itemCount: 5,
+                              itemBuilder: (context, i) {
+                                return Shimmer.fromColors(
+                                  baseColor: Colors.grey.shade300,
+                                  highlightColor: Colors.grey.shade50,
+                                  child: Container(
+                                    width: MediaQuery.of(context).size.width,
+                                    height: 100,
                                   ),
                                 );
-                              else
-                                return ListTile(
-                                  onTap: () {
-                                    Navigator.pushNamed(context, 'equipment',
-                                        arguments: currentSiteData[i]);
-                                  },
-                                  title: Text(
-                                    currentSiteData[i].name,
-                                    style: GoogleFonts.roboto().copyWith(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500),
-                                  ),
-                                  subtitle: StreamBuilder<int>(
-                                      stream: EquipmentService()
-                                          .getEquipmentCount(
-                                              currentSiteData[i]),
-                                      builder: (context, snapshotI) {
-                                        if (snapshotI.hasError) return Text('');
-                                        switch (snapshotI.connectionState) {
-                                          case ConnectionState.waiting:
-                                            return Shimmer.fromColors(
-                                              child: Text(
-                                                'equipment count :',
+                              }),
+                        );
+                      default:
+                        List<FacilitesModel> facilities = snapshot.data;
+                        List<FacilitesModel> currentSiteData = [];
+                        for (var item in facilities) {
+                          if (currentSite != null) if (item.site.name
+                              .contains(currentSite.name))
+                            currentSiteData.add(item);
+                        }
+                        return Container(
+                          height: 700,
+                          child: ListView.builder(
+                              primary: false,
+                              itemCount: currentSiteData.length + 1,
+                              itemBuilder: (context, i) {
+                                if (i == currentSiteData.length)
+                                  return ListTile(
+                                    onTap: () {
+                                      newFacility(context);
+                                    },
+                                    title: Text(
+                                      'new facility',
+                                      style: GoogleFonts.roboto().copyWith(
+                                          color: Theme.of(context).primaryColor,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                    trailing: FaIcon(
+                                      FontAwesomeIcons.plus,
+                                      color: Theme.of(context).primaryColor,
+                                    ),
+                                  );
+                                else
+                                  return ListTile(
+                                    onTap: () {
+                                      Navigator.pushNamed(context, 'equipment',
+                                          arguments: currentSiteData[i]);
+                                    },
+                                    title: Text(
+                                      currentSiteData[i].name,
+                                      style: GoogleFonts.roboto().copyWith(
+                                          color: Colors.black,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                    subtitle: StreamBuilder<int>(
+                                        stream: EquipmentService()
+                                            .getEquipmentCount(
+                                                currentSiteData[i]),
+                                        builder: (context, snapshotI) {
+                                          if (snapshotI.hasError)
+                                            return Text('');
+                                          switch (snapshotI.connectionState) {
+                                            case ConnectionState.waiting:
+                                              return Shimmer.fromColors(
+                                                child: Text(
+                                                  'equipment count :',
+                                                  style: GoogleFonts.roboto()
+                                                      .copyWith(
+                                                          color: Colors.black,
+                                                          fontSize: 14),
+                                                ),
+                                                baseColor: Colors.grey.shade300,
+                                                highlightColor:
+                                                    Colors.grey.shade50,
+                                              );
+                                              break;
+                                            default:
+                                              return Text(
+                                                'equipment count : ${snapshotI.data}',
                                                 style: GoogleFonts.roboto()
                                                     .copyWith(
                                                         color: Colors.black,
                                                         fontSize: 14),
-                                              ),
-                                              baseColor: Colors.grey.shade300,
-                                              highlightColor:
-                                                  Colors.grey.shade50,
-                                            );
-                                            break;
-                                          default:
-                                            return Text(
-                                              'equipment count : ${snapshotI.data}',
-                                              style: GoogleFonts.roboto()
-                                                  .copyWith(
-                                                      color: Colors.black,
-                                                      fontSize: 14),
-                                            );
-                                        }
-                                      }),
-                                  trailing: FaIcon(
-                                    FontAwesomeIcons.chevronRight,
-                                    color: Colors.black,
-                                  ),
-                                );
-                            }),
-                      );
-                  }
-                })
-          ],
-        ),
-      )),
+                                              );
+                                          }
+                                        }),
+                                    trailing: FaIcon(
+                                      FontAwesomeIcons.chevronRight,
+                                      color: Colors.black,
+                                    ),
+                                  );
+                              }),
+                        );
+                    }
+                  })
+            ],
+          ),
+        )),
+      ),
     );
   }
 
