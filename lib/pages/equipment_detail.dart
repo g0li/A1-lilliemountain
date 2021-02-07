@@ -228,7 +228,8 @@ class _EquipmentDetailPageState extends State<EquipmentDetailPage>
                                             (BuildContext context, int index) =>
                                                 Divider(),
                                       )
-                                    : Center(
+                                    : Align(
+                                        alignment: Alignment.topLeft,
                                         child: Text(
                                             'No Live Services for ${widget.equipment.name}'),
                                       ),
@@ -246,7 +247,8 @@ class _EquipmentDetailPageState extends State<EquipmentDetailPage>
                                             (BuildContext context, int index) =>
                                                 Divider(),
                                       )
-                                    : Center(
+                                    : Align(
+                                        alignment: Alignment.topLeft,
                                         child: Text(
                                             'No closed Services for ${widget.equipment.name}'),
                                       ),
