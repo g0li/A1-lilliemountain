@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:skimscope/model/sites_model.dart';
 
 class SiteWidget extends StatefulWidget {
-  bool isActive;
-  final String siteName;
-  SiteWidget({Key key, this.isActive = false, this.siteName}) : super(key: key);
-
+  SitesModel site;
+  SiteWidget({Key key, this.site, this.onTap}) : super(key: key);
+  final Function onTap;
   @override
   _SiteWidgetState createState() => _SiteWidgetState();
 }
@@ -18,14 +18,13 @@ class _SiteWidgetState extends State<SiteWidget> {
         Container(
           margin: const EdgeInsets.all(4.0),
           child: Material(
-            color: !widget.isActive
-                ? Theme.of(context).primaryColor
-                : Color(0xFFF28F3B),
+            color: Theme.of(context).primaryColor,
             borderRadius: BorderRadius.circular(20),
             child: InkWell(
                 onTap: () {
                   setState(() {
-                    widget.isActive = !widget.isActive;
+                    // widget.isCurrent = !widget.site.isActive;
+                    widget.onTap(widget.site);
                   });
                 },
                 borderRadius: BorderRadius.circular(20),
@@ -35,18 +34,16 @@ class _SiteWidgetState extends State<SiteWidget> {
                   child: Container(
                     alignment: Alignment.center,
                     child: Text(
-                      widget.siteName[0],
-                      style: GoogleFonts.roboto(
-                          fontSize: 40,
-                          color:
-                              !widget.isActive ? Colors.black : Colors.white),
+                      widget.site.name[0],
+                      style:
+                          GoogleFonts.roboto(fontSize: 40, color: Colors.white),
                     ),
                   ),
                 )),
           ),
         ),
         Text(
-          widget.siteName,
+          widget.site.name,
           style: GoogleFonts.roboto(fontSize: 18, color: Colors.black),
         ),
       ],

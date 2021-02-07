@@ -83,4 +83,23 @@ class EquipmentService {
       return null;
     }
   }
+
+  // get all equipments
+  Stream<int> getEquipmentCount(FacilitesModel facilityModel) {
+    try {
+      var equipmentRef = db
+          .collection('equipments')
+          .where('facilityId',
+              isEqualTo: FacilitesModel.facilityToJSon(facilityModel))
+          .snapshots();
+      return equipmentRef.map((event) => event.size);
+
+      // var list = equipmentRef.map((d) =>
+      //     d.docs.map((doc) => EquipmentModel.fromFirestore(doc)).toList());
+      // return list;
+    } catch (err) {
+      print(err.toString());
+      return null;
+    }
+  }
 }

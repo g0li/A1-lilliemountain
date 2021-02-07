@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -5,28 +6,23 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:skimscope/model/equipment_model.dart';
 import 'package:skimscope/widgets/service_widget.dart';
 
-class EquipmentDetailPage extends StatefulWidget {
+class EquipmentDetailPage extends StatelessWidget {
   EquipmentModel equipment;
 
   EquipmentDetailPage({Key key, this.equipment}) : super(key: key);
 
   @override
-  _EquipmentDetailPageState createState() => _EquipmentDetailPageState();
-}
-
-class _EquipmentDetailPageState extends State<EquipmentDetailPage> {
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('${widget.equipment.name}'),
+        title: Text('${equipment.name}'),
         actions: [
           CupertinoSwitch(
-              value: widget.equipment.isActive,
+              value: equipment.isActive,
               onChanged: (_) {
-                setState(() {
-                  widget.equipment.isActive = _;
-                });
+                // setState(() {
+                //   widget.equipment.isActive = _;
+                // });
               }),
           IconButton(
             icon: FaIcon(FontAwesomeIcons.home),
@@ -68,7 +64,7 @@ class _EquipmentDetailPageState extends State<EquipmentDetailPage> {
                     borderRadius: BorderRadius.circular(40),
                     image: DecorationImage(
                       image: NetworkImage(
-                        'https://via.placeholder.com/500.png?text=PlaceHolder+For+Equipment+Image',
+                        equipment.imageUrl,
                       ),
                     ),
                   ),
@@ -78,11 +74,12 @@ class _EquipmentDetailPageState extends State<EquipmentDetailPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    widget.equipment.srNo,
+                    equipment.srNo,
                     style: GoogleFonts.roboto()
                         .copyWith(color: Colors.black, fontSize: 12),
                   ),
-                  Text('doi :${widget.equipment.installationDate}',
+                  Text(
+                      'doi :${(equipment.installationDate as Timestamp).toDate().toString().split(' ')[0]}',
                       style: GoogleFonts.roboto().copyWith(
                           color: Color(0xFF5C5C5C),
                           fontSize: 12,
@@ -92,7 +89,7 @@ class _EquipmentDetailPageState extends State<EquipmentDetailPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(widget.equipment.name,
+                  Text(equipment.name,
                       style: GoogleFonts.roboto().copyWith(
                           color: Colors.black,
                           fontSize: 16,
@@ -102,8 +99,7 @@ class _EquipmentDetailPageState extends State<EquipmentDetailPage> {
                       onPressed: () {})
                 ],
               ),
-              Text(
-                  '${widget.equipment.siteId} / ${widget.equipment.facilityId}',
+              Text('${equipment.siteId.name} / ${equipment.facilityId.name}',
                   style: GoogleFonts.roboto().copyWith(
                       color: Color(0xFF5C5C5C),
                       fontSize: 12,

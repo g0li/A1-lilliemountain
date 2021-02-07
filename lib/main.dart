@@ -49,7 +49,8 @@ class MyApp extends StatelessWidget {
             case 'admin':
               return CupertinoPageRoute(builder: (_) => AdminHomePage());
             case 'equipment':
-              return CupertinoPageRoute(builder: (_) => EquipmentPage());
+              return CupertinoPageRoute(
+                  builder: (_) => EquipmentPage(settings.arguments));
             case 'edetails':
               return CupertinoPageRoute(
                   builder: (_) => EquipmentDetailPage(

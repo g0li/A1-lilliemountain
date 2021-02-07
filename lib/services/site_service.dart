@@ -48,7 +48,10 @@ class SiteService {
   // get all Sites
   Stream<List<SitesModel>> getAllSites() {
     try {
-      var siteRef = db.collection('sites').snapshots();
+      var siteRef = db
+          .collection('sites')
+          .orderBy('whenCreated', descending: true)
+          .snapshots();
       var list = siteRef.map(
           (d) => d.docs.map((doc) => SitesModel.fromFirestore(doc)).toList());
       return list;
