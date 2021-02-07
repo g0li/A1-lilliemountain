@@ -63,8 +63,10 @@ class MaintenanceService {
     @required String equipmentId,
   }) {
     try {
-      var servicesRef =
-          db.collection('equipments/$equipmentId/services').snapshots();
+      var servicesRef = db
+          .collection('equipments/$equipmentId/services')
+          .orderBy('whenCreated', descending: true)
+          .snapshots();
       var list = servicesRef.map((d) =>
           d.docs.map((doc) => ServicesModel.fromFirestore(doc)).toList());
       return list;
