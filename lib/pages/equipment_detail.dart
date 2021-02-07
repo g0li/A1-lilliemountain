@@ -228,10 +228,10 @@ class _EquipmentDetailPageState extends State<EquipmentDetailPage>
                               history.add(item);
                           }
                         }
-                        List<ServicesModel> live = snapshot.data
+                        List<ServicesModel> live = history
                             .where((element) => element.endDate == null)
                             .toList();
-                        List<ServicesModel> closed = snapshot.data
+                        List<ServicesModel> closed = history
                             .where((element) => element.endDate != null)
                             .toList();
                         if (history.length > 0) {
