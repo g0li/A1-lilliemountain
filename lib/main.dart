@@ -41,6 +41,7 @@ class MyApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'Skimscope',
         theme: ThemeData(
           primaryColor: Color(0xFF588B8B),
