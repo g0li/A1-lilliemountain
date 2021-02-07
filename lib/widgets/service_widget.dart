@@ -77,8 +77,8 @@ class ServiceWidget extends StatelessWidget {
                             equipmentId: servicesModel.equipmentId,
                             title: servicesModel.title,
                             equipmentName: servicesModel.equipmentName,
-                            startDate: (servicesModel.startDate).toDate(),
-                            endDate: DateTime.now(),
+                            startDate: (servicesModel.startDate),
+                            endDate: Timestamp.now(),
                             mode: 'edit',
                             serviceId: servicesModel.id,
                             facility: servicesModel.facility,
@@ -87,6 +87,7 @@ class ServiceWidget extends StatelessWidget {
                         .then((value) {
                       value
                           ? globalKey.currentState.showSnackBar(SnackBar(
+                              duration: Duration(milliseconds: 500),
                               content: Text('Service Updated',
                                   style: GoogleFonts.roboto()
                                       .copyWith(color: Colors.green)),

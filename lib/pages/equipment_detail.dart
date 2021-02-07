@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:skimscope/model/equipment_model.dart';
 import 'package:skimscope/model/services_model.dart';
@@ -10,6 +11,7 @@ import 'package:skimscope/services/equipment_service.dart';
 import 'package:skimscope/services/maintenance_service.dart';
 import 'package:skimscope/widgets/api_loader.dart';
 import 'package:skimscope/widgets/service_widget.dart';
+import 'package:encrypt/encrypt.dart' as e;
 
 class EquipmentDetailPage extends StatefulWidget {
   EquipmentModel equipment;
@@ -73,6 +75,7 @@ class _EquipmentDetailPageState extends State<EquipmentDetailPage>
             icon: FaIcon(FontAwesomeIcons.qrcode),
             onPressed: () {
               // Navigator.pushNamed(context, 'employee');
+              generateQRCODE(widget.equipment);
             },
           )
         ],
@@ -225,7 +228,8 @@ class _EquipmentDetailPageState extends State<EquipmentDetailPage>
                                             (BuildContext context, int index) =>
                                                 Divider(),
                                       )
-                                    : Center(
+                                    : Align(
+                                        alignment: Alignment.topLeft,
                                         child: Text(
                                             'No Live Services for ${widget.equipment.name}'),
                                       ),
@@ -243,7 +247,8 @@ class _EquipmentDetailPageState extends State<EquipmentDetailPage>
                                             (BuildContext context, int index) =>
                                                 Divider(),
                                       )
-                                    : Center(
+                                    : Align(
+                                        alignment: Alignment.topLeft,
                                         child: Text(
                                             'No closed Services for ${widget.equipment.name}'),
                                       ),
@@ -260,5 +265,46 @@ class _EquipmentDetailPageState extends State<EquipmentDetailPage>
         ),
       ),
     );
+  }
+
+  generateQRCODE(EquipmentModel equipment) {
+    String id = equipment.id;
+    final key = e.Key.fromLength(32);
+    final iv = e.IV.fromLength(8);
+    final encrypter = e.Encrypter(e.Salsa20(key));
+    final encrypted = encrypter.encrypt(id, iv: iv);
+    showDialog(
+        context: context,
+        builder: (context) => Dialog(
+              child: FittedBox(
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      QrImage(
+                        data: encrypted.base64,
+                        version: QrVersions.auto,
+                        backgroundColor: Colors.white,
+                        size: 200.0,
+                      ),
+                      Opacity(
+                        opacity: .4,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Text(
+                            'skimscope',
+                            style: GoogleFonts.roboto().copyWith(
+                                color: Theme.of(context).primaryColor,
+                                fontSize: 10,
+                                fontStyle: FontStyle.italic),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ));
   }
 }

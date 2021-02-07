@@ -90,6 +90,8 @@ class EquipmentPage extends StatelessWidget {
             TextEditingController name = TextEditingController();
             TextEditingController srNo = TextEditingController();
             TextEditingController doI = TextEditingController();
+            GlobalKey<FormState> eFormKey = GlobalKey<FormState>();
+            GlobalKey<ScaffoldState> addEKey = GlobalKey<ScaffoldState>();
             showModalBottomSheet(
                 isDismissible: false,
                 context: context,
@@ -104,11 +106,13 @@ class EquipmentPage extends StatelessWidget {
                       builder: (context, setstate) => Container(
                         height: MediaQuery.of(context).size.height * 0.75,
                         child: Scaffold(
+                          key: addEKey,
                           appBar: AppBar(
                             title: Text('New Equipment'),
                           ),
                           body: SingleChildScrollView(
                             child: Form(
+                              key: eFormKey,
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 28.0, vertical: 16),
@@ -148,6 +152,11 @@ class EquipmentPage extends StatelessWidget {
                                         child: TextFormField(
                                             controller: name,
                                             keyboardType: TextInputType.text,
+                                            validator: (value) {
+                                              if (value.trim().isEmpty)
+                                                return 'Please enter equipment name';
+                                              return null;
+                                            },
                                             decoration: InputDecoration(
                                               labelText: 'Equipment name',
                                               border: OutlineInputBorder(
@@ -163,6 +172,11 @@ class EquipmentPage extends StatelessWidget {
                                         child: TextFormField(
                                             controller: srNo,
                                             keyboardType: TextInputType.text,
+                                            validator: (value) {
+                                              if (value.trim().isEmpty)
+                                                return 'Please enter serial number';
+                                              return null;
+                                            },
                                             decoration: InputDecoration(
                                               labelText: 'S/N',
                                               border: OutlineInputBorder(
@@ -242,8 +256,24 @@ class EquipmentPage extends StatelessWidget {
                                               child: Text('Create'),
                                               onPressed: () {
                                                 // Navigator.pop(context);
-                                                createEquipment(
-                                                    name, srNo, context);
+                                                if (eFormKey.currentState
+                                                        .validate() &&
+                                                    _image != null)
+                                                  createEquipment(
+                                                      name, srNo, context);
+                                                else if (_image == null)
+                                                  addEKey.currentState
+                                                      .showSnackBar(SnackBar(
+                                                    content: Text(
+                                                        'Please provide with equipment image',
+                                                        style: GoogleFonts
+                                                                .roboto()
+                                                            .copyWith(
+                                                                color: Colors
+                                                                    .red)),
+                                                    backgroundColor:
+                                                        Colors.red.shade100,
+                                                  ));
                                               })),
                                     ]),
                               ),
@@ -374,6 +404,18 @@ class EquipmentPage extends StatelessWidget {
                                       default:
                                         List<ServicesModel> data =
                                             snapshotB.data;
+                                        ServicesModel last;
+                                        try {
+                                          last = snapshotB.data.lastWhere(
+                                              (element) =>
+                                                  element.endDate != null);
+                                        } catch (e) {
+                                          last = null;
+                                        }
+                                        int lastIndex =
+                                            snapshotB.data.lastIndexOf(
+                                          last,
+                                        );
                                         return ListTile(
                                           contentPadding: EdgeInsets.symmetric(
                                               vertical: 8, horizontal: 8),
@@ -395,77 +437,9 @@ class EquipmentPage extends StatelessWidget {
                                                               Color(0xFF5C5C5C),
                                                           fontSize: 12,
                                                         )),
-                                                    Text(data.length.toString(),
-                                                        style:
-                                                            GoogleFonts.roboto()
-                                                                .copyWith(
-                                                          color: Colors.black,
-                                                          fontSize: 14,
-                                                        )),
-                                                  ],
-                                                ),
-                                              ),
-                                              Padding(
-                                                padding: EdgeInsets.symmetric(
-                                                    vertical: 8),
-                                                child: Row(
-                                                  children: [
-                                                    Text('last service by :',
-                                                        style:
-                                                            GoogleFonts.roboto()
-                                                                .copyWith(
-                                                          color:
-                                                              Color(0xFF5C5C5C),
-                                                          fontSize: 12,
-                                                        )),
-                                                    StreamBuilder<UserModel>(
-                                                        stream: AuthService()
-                                                            .getUser(data.last
-                                                                .createdBy),
-                                                        builder: (context,
-                                                            snapshot) {
-                                                          if (snapshot.hasError)
-                                                            return Text('NA');
-                                                          switch (snapshot
-                                                              .connectionState) {
-                                                            case ConnectionState
-                                                                .waiting:
-                                                              return Container();
-                                                            default:
-                                                              return Text(
-                                                                  snapshot.data
-                                                                      .name,
-                                                                  style: GoogleFonts.roboto().copyWith(
-                                                                      color: Color(
-                                                                          0xFF5C5C5C),
-                                                                      fontSize:
-                                                                          12,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w500));
-                                                          }
-                                                        }),
-                                                  ],
-                                                ),
-                                              ),
-                                              Padding(
-                                                padding: EdgeInsets.symmetric(
-                                                    vertical: 8),
-                                                child: Row(
-                                                  children: [
-                                                    Text('service date: ',
-                                                        style:
-                                                            GoogleFonts.roboto()
-                                                                .copyWith(
-                                                          color:
-                                                              Color(0xFF5C5C5C),
-                                                          fontSize: 12,
-                                                        )),
                                                     Text(
-                                                        data.last.endDate
-                                                            .toDate()
-                                                            .toString()
-                                                            .split(' ')[0],
+                                                        (lastIndex + 1)
+                                                            .toString(),
                                                         style:
                                                             GoogleFonts.roboto()
                                                                 .copyWith(
@@ -475,26 +449,130 @@ class EquipmentPage extends StatelessWidget {
                                                   ],
                                                 ),
                                               ),
-                                              Align(
-                                                alignment:
-                                                    Alignment.bottomRight,
-                                                child: CupertinoButton(
-                                                  onPressed: () {
-                                                    Navigator.pushNamed(
-                                                        context, 'edetails',
-                                                        arguments: item);
-                                                  },
-                                                  child: Text(
-                                                    'MORE',
-                                                    style: GoogleFonts.roboto()
-                                                        .copyWith(
-                                                            color: Color(
-                                                                0xFFC8553D),
-                                                            decoration:
-                                                                TextDecoration
-                                                                    .underline),
+                                              last != null
+                                                  ? Padding(
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              vertical: 8),
+                                                      child: Row(
+                                                        children: [
+                                                          Text(
+                                                              'last service by :',
+                                                              style: GoogleFonts
+                                                                      .roboto()
+                                                                  .copyWith(
+                                                                color: Color(
+                                                                    0xFF5C5C5C),
+                                                                fontSize: 12,
+                                                              )),
+                                                          StreamBuilder<
+                                                                  UserModel>(
+                                                              stream: AuthService()
+                                                                  .getUser(last
+                                                                      .createdBy),
+                                                              builder: (context,
+                                                                  snapshot) {
+                                                                if (snapshot
+                                                                    .hasError)
+                                                                  return Text(
+                                                                      'NA');
+                                                                switch (snapshot
+                                                                    .connectionState) {
+                                                                  case ConnectionState
+                                                                      .waiting:
+                                                                    return Container();
+                                                                  default:
+                                                                    return Text(
+                                                                        snapshot
+                                                                            .data
+                                                                            .name,
+                                                                        style: GoogleFonts.roboto().copyWith(
+                                                                            color: Color(
+                                                                                0xFF5C5C5C),
+                                                                            fontSize:
+                                                                                12,
+                                                                            fontWeight:
+                                                                                FontWeight.w500));
+                                                                }
+                                                              }),
+                                                        ],
+                                                      ),
+                                                    )
+                                                  : Container(),
+                                              last != null
+                                                  ? Padding(
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              vertical: 8),
+                                                      child: Row(
+                                                        children: [
+                                                          Text('service date: ',
+                                                              style: GoogleFonts
+                                                                      .roboto()
+                                                                  .copyWith(
+                                                                color: Color(
+                                                                    0xFF5C5C5C),
+                                                                fontSize: 12,
+                                                              )),
+                                                          Text(
+                                                              last.endDate
+                                                                  .toDate()
+                                                                  .toString()
+                                                                  .split(
+                                                                      ' ')[0],
+                                                              style: GoogleFonts
+                                                                      .roboto()
+                                                                  .copyWith(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontSize: 14,
+                                                              )),
+                                                        ],
+                                                      ),
+                                                    )
+                                                  : Container(),
+                                              Row(
+                                                children: [
+                                                  Flexible(
+                                                    fit: FlexFit.tight,
+                                                    flex: 1,
+                                                    child: FlatButton(
+                                                      onPressed: () {
+                                                        showAlertDialog(
+                                                            context, item);
+                                                      },
+                                                      child: Text(
+                                                        'DELETE',
+                                                        style:
+                                                            GoogleFonts.roboto()
+                                                                .copyWith(
+                                                          color:
+                                                              Color(0xFFC8553D),
+                                                        ),
+                                                      ),
+                                                    ),
                                                   ),
-                                                ),
+                                                  Flexible(
+                                                    flex: 1,
+                                                    fit: FlexFit.tight,
+                                                    child: FlatButton(
+                                                      onPressed: () {
+                                                        Navigator.pushNamed(
+                                                            context, 'edetails',
+                                                            arguments: item);
+                                                      },
+                                                      child: Text(
+                                                        'MORE',
+                                                        style:
+                                                            GoogleFonts.roboto()
+                                                                .copyWith(
+                                                          color:
+                                                              Color(0xFFC8553D),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
                                               )
                                             ],
                                           ),
@@ -568,5 +646,57 @@ class EquipmentPage extends StatelessWidget {
         sdValue = picked.toString().split(' ')[0];
       });
     print(sdValue);
+  }
+
+  showAlertDialog(BuildContext context, EquipmentModel equipmentModel) {
+    Widget cancelButton = FlatButton(
+      child: Text("Cancel"),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+    Widget continueButton = FlatButton(
+      child: Text("Continue"),
+      onPressed: () {
+        EquipmentService()
+            .deleteEquipment(equipmentId: equipmentModel.id)
+            .then((value) {
+          if (value) {
+            Navigator.pop(context);
+            eKey.currentState.showSnackBar(SnackBar(
+              duration: Duration(milliseconds: 1000),
+              content: Text('Service Updated',
+                  style: GoogleFonts.roboto().copyWith(color: Colors.green)),
+              backgroundColor: Colors.lightGreen.shade100,
+            ));
+          } //issue here
+          else {
+            Navigator.pop(context);
+            eKey.currentState.showSnackBar(SnackBar(
+              duration: Duration(milliseconds: 1000),
+              content: Text('Something went wrong',
+                  style: GoogleFonts.roboto().copyWith(color: Colors.red)),
+              backgroundColor: Colors.red.shade100,
+            ));
+          }
+        });
+      },
+    );
+
+    AlertDialog alert = AlertDialog(
+      title: Text("DELETE ${equipmentModel.name}"),
+      content: Text("Would you like to proceed ahead?"),
+      actions: [
+        cancelButton,
+        continueButton,
+      ],
+    );
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
   }
 }

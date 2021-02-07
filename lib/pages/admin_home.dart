@@ -149,6 +149,13 @@ class _AdminHomePageState extends State<AdminHomePage> {
                                 });
                         }),
                   ),
+            Text(
+              'Facilities',
+              style: GoogleFonts.roboto().copyWith(
+                  fontWeight: FontWeight.w900,
+                  color: Theme.of(context).primaryColor,
+                  fontSize: 24),
+            ),
             StreamBuilder<List<FacilitesModel>>(
                 stream: FacilityService().getAllFacilities(),
                 builder: (context, snapshot) {
@@ -210,10 +217,10 @@ class _AdminHomePageState extends State<AdminHomePage> {
                                 return ListTile(
                                   onTap: () {
                                     Navigator.pushNamed(context, 'equipment',
-                                        arguments: facilities[i]);
+                                        arguments: currentSiteData[i]);
                                   },
                                   title: Text(
-                                    facilities[i].name,
+                                    currentSiteData[i].name,
                                     style: GoogleFonts.roboto().copyWith(
                                         color: Colors.black,
                                         fontSize: 16,
@@ -221,7 +228,8 @@ class _AdminHomePageState extends State<AdminHomePage> {
                                   ),
                                   subtitle: StreamBuilder<int>(
                                       stream: EquipmentService()
-                                          .getEquipmentCount(facilities[i]),
+                                          .getEquipmentCount(
+                                              currentSiteData[i]),
                                       builder: (context, snapshotI) {
                                         if (snapshotI.hasError) return Text('');
                                         switch (snapshotI.connectionState) {
@@ -266,6 +274,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
 
   newSite(context) {
     TextEditingController controller = TextEditingController();
+    GlobalKey<FormState> siteFormKey = GlobalKey<FormState>();
     showModalBottomSheet(
       context: context,
       builder: (context) {
@@ -275,6 +284,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
             title: Text('New site'),
           ),
           body: Form(
+            key: siteFormKey,
             child: Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 28.0, vertical: 16),
@@ -286,6 +296,11 @@ class _AdminHomePageState extends State<AdminHomePage> {
                       child: TextFormField(
                           controller: controller,
                           keyboardType: TextInputType.text,
+                          validator: (value) {
+                            if (value.trim().isEmpty)
+                              return 'Please enter site name';
+                            return null;
+                          },
                           decoration: InputDecoration(
                             labelText: 'site name',
                             border: OutlineInputBorder(
@@ -303,37 +318,40 @@ class _AdminHomePageState extends State<AdminHomePage> {
                           child: Text('Create'),
                           onPressed: () {
                             // Navigator.pop(context);
-                            SiteService()
-                                .createSite(
-                                    name: controller.text,
-                                    createdBy:
-                                        FirebaseAuth.instance.currentUser.uid)
-                                .then((value) {
-                              if (MediaQuery.of(context).viewInsets.bottom != 0)
-                                Navigator.pop(context);
-                              value
-                                  ? adminKey.currentState
-                                      .showSnackBar(SnackBar(
-                                        content: Text('Site added',
-                                            style: GoogleFonts.roboto()
-                                                .copyWith(color: Colors.green)),
-                                        backgroundColor:
-                                            Colors.lightGreen.shade100,
-                                      ))
-                                      .closed
-                                      .then((value) =>
-                                          Navigator.pop(context)) //issue here
-                                  : adminKey.currentState
-                                      .showSnackBar(SnackBar(
-                                        content: Text('Something went wrong',
-                                            style: GoogleFonts.roboto()
-                                                .copyWith(color: Colors.red)),
-                                        backgroundColor: Colors.red.shade100,
-                                      ))
-                                      .closed
-                                      .then((value) =>
-                                          Navigator.pop(context)); //issue here
-                            });
+                            if (siteFormKey.currentState.validate()) {
+                              SiteService()
+                                  .createSite(
+                                      name: controller.text,
+                                      createdBy:
+                                          FirebaseAuth.instance.currentUser.uid)
+                                  .then((value) {
+                                if (MediaQuery.of(context).viewInsets.bottom !=
+                                    0) Navigator.pop(context);
+                                value
+                                    ? adminKey.currentState
+                                        .showSnackBar(SnackBar(
+                                          content: Text('Site added',
+                                              style: GoogleFonts.roboto()
+                                                  .copyWith(
+                                                      color: Colors.green)),
+                                          backgroundColor:
+                                              Colors.lightGreen.shade100,
+                                        ))
+                                        .closed
+                                        .then((value) =>
+                                            Navigator.pop(context)) //issue here
+                                    : adminKey.currentState
+                                        .showSnackBar(SnackBar(
+                                          content: Text('Something went wrong',
+                                              style: GoogleFonts.roboto()
+                                                  .copyWith(color: Colors.red)),
+                                          backgroundColor: Colors.red.shade100,
+                                        ))
+                                        .closed
+                                        .then((value) => Navigator.pop(
+                                            context)); //issue here
+                              });
+                            }
                           },
                         )),
                   ]),
@@ -347,6 +365,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
   newFacility(context) {
     SitesModel currentSiteBS = provider.allSites.first;
     TextEditingController controller = TextEditingController();
+    GlobalKey<FormState> facilityFormKey = GlobalKey<FormState>();
     showModalBottomSheet(
       context: context,
       builder: (context) {
@@ -357,6 +376,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
               title: Text('New Facility'),
             ),
             body: Form(
+              key: facilityFormKey,
               child: Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 28.0, vertical: 16),
@@ -368,6 +388,12 @@ class _AdminHomePageState extends State<AdminHomePage> {
                         child: TextFormField(
                             keyboardType: TextInputType.text,
                             controller: controller,
+                            validator: (value) {
+                              if (value.trim().isEmpty) {
+                                return 'Please enter Facility name.';
+                              }
+                              return null;
+                            },
                             decoration: InputDecoration(
                               labelText: 'Facility name',
                               border: OutlineInputBorder(
@@ -391,7 +417,6 @@ class _AdminHomePageState extends State<AdminHomePage> {
                               setstate(() {
                                 currentSiteBS = newVal;
                               });
-                              print(currentSiteBS.name);
                             }),
                       ),
                       Container(
@@ -403,39 +428,46 @@ class _AdminHomePageState extends State<AdminHomePage> {
                             child: Text('Create'),
                             onPressed: () {
                               // Navigator.pop(context);
-                              FacilityService()
-                                  .createFacility(
-                                      site: currentSiteBS,
-                                      name: controller.text,
-                                      createdBy:
-                                          FirebaseAuth.instance.currentUser.uid)
-                                  .then((value) {
-                                if (MediaQuery.of(context).viewInsets.bottom !=
-                                    0) Navigator.pop(context);
-                                value
-                                    ? adminKey.currentState
-                                        .showSnackBar(SnackBar(
-                                          content: Text('Facility added',
-                                              style: GoogleFonts.roboto()
-                                                  .copyWith(
-                                                      color: Colors.green)),
-                                          backgroundColor:
-                                              Colors.lightGreen.shade100,
-                                        ))
-                                        .closed
-                                        .then((value) =>
-                                            Navigator.pop(context)) //issue here
-                                    : adminKey.currentState
-                                        .showSnackBar(SnackBar(
-                                          content: Text('Something went wrong',
-                                              style: GoogleFonts.roboto()
-                                                  .copyWith(color: Colors.red)),
-                                          backgroundColor: Colors.red.shade100,
-                                        ))
-                                        .closed
-                                        .then((value) => Navigator.pop(
-                                            context)); //issue here
-                              });
+                              if (facilityFormKey.currentState.validate()) {
+                                FacilityService()
+                                    .createFacility(
+                                        site: currentSiteBS,
+                                        name: controller.text,
+                                        createdBy: FirebaseAuth
+                                            .instance.currentUser.uid)
+                                    .then((value) {
+                                  if (MediaQuery.of(context)
+                                          .viewInsets
+                                          .bottom !=
+                                      0) Navigator.pop(context);
+                                  value
+                                      ? adminKey.currentState
+                                          .showSnackBar(SnackBar(
+                                            content: Text('Facility added',
+                                                style: GoogleFonts.roboto()
+                                                    .copyWith(
+                                                        color: Colors.green)),
+                                            backgroundColor:
+                                                Colors.lightGreen.shade100,
+                                          ))
+                                          .closed
+                                          .then((value) => Navigator.pop(
+                                              context)) //issue here
+                                      : adminKey.currentState
+                                          .showSnackBar(SnackBar(
+                                            content: Text(
+                                                'Something went wrong',
+                                                style: GoogleFonts.roboto()
+                                                    .copyWith(
+                                                        color: Colors.red)),
+                                            backgroundColor:
+                                                Colors.red.shade100,
+                                          ))
+                                          .closed
+                                          .then((value) => Navigator.pop(
+                                              context)); //issue here
+                                });
+                              }
                             },
                           )),
                     ]),
