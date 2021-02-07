@@ -1,9 +1,13 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:skimscope/model/equipment_model.dart';
+import 'package:skimscope/providers/user_provider.dart';
 import 'package:skimscope/services/auth_service.dart';
 import 'package:encrypt/encrypt.dart' as e;
 import 'package:skimscope/services/equipment_service.dart';
@@ -19,14 +23,17 @@ class EmployeeHomePage extends StatelessWidget {
     siteId: 'site 1 ',
     srNo: 'SN-00851#232',
   );
+  final df = new DateFormat('dd/MM/yyyy');
   final authService = AuthService();
   @override
   Widget build(BuildContext context) {
+    var userProvider = Provider.of<UserProvider>(context);
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Hello Employee Name'),
+          title: Text(
+              'Hello ${userProvider.user != null ? userProvider.user.name : 'User'}'),
           actions: [
             IconButton(
                 icon: FaIcon(FontAwesomeIcons.signOutAlt),
@@ -38,55 +45,57 @@ class EmployeeHomePage extends StatelessWidget {
         ),
         body: Column(
           children: [
-            ListTile(
-              leading: Container(
-                height: 80,
-                width: 80,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  image: DecorationImage(
-                    fit: BoxFit.cover,
-                    image: NetworkImage(
-                      'https://via.placeholder.com/80x80.png',
+            if (userProvider.user != null)
+              ListTile(
+                leading: Container(
+                  height: 80,
+                  width: 80,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    image: DecorationImage(
+                      fit: BoxFit.cover,
+                      image: CachedNetworkImageProvider(
+                        userProvider.user.imageUrl ??
+                            'https://via.placeholder.com/80x80.png',
+                      ),
                     ),
                   ),
                 ),
-              ),
-              title: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.symmetric(vertical: 4),
-                    child: Text(
-                      'employee name',
-                      style: GoogleFonts.roboto().copyWith(
-                          fontSize: 16,
-                          color: Colors.black,
-                          fontWeight: FontWeight.w500),
-                    ),
-                  ),
-                  Padding(
+                title: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
                       padding: EdgeInsets.symmetric(vertical: 4),
                       child: Text(
-                        'employee@company.org',
+                        userProvider.user.name,
                         style: GoogleFonts.roboto().copyWith(
-                          fontSize: 12,
-                          color: Colors.black,
-                        ),
-                      )),
-                  Padding(
-                    padding: EdgeInsets.symmetric(vertical: 4),
-                    child: Text(
-                      'joining date : 31/05/2021',
-                      style: GoogleFonts.roboto().copyWith(
-                          fontSize: 12,
-                          color: Color(0xFF5C5C5C),
-                          fontWeight: FontWeight.w500),
+                            fontSize: 16,
+                            color: Colors.black,
+                            fontWeight: FontWeight.w500),
+                      ),
                     ),
-                  )
-                ],
+                    Padding(
+                        padding: EdgeInsets.symmetric(vertical: 4),
+                        child: Text(
+                          userProvider.user.email,
+                          style: GoogleFonts.roboto().copyWith(
+                            fontSize: 12,
+                            color: Colors.black,
+                          ),
+                        )),
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 4),
+                      child: Text(
+                        'joining date : ${df.format(userProvider.user.joiningDate.toDate())}',
+                        style: GoogleFonts.roboto().copyWith(
+                            fontSize: 12,
+                            color: Color(0xFF5C5C5C),
+                            fontWeight: FontWeight.w500),
+                      ),
+                    )
+                  ],
+                ),
               ),
-            ),
             SizedBox(
               height: 40,
             ),

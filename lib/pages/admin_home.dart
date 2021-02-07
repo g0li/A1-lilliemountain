@@ -8,6 +8,7 @@ import 'package:shimmer/shimmer.dart';
 import 'package:skimscope/model/facilities_model.dart';
 import 'package:skimscope/model/sites_model.dart';
 import 'package:skimscope/providers/site_provider.dart';
+import 'package:skimscope/services/auth_service.dart';
 import 'package:skimscope/services/equipment_service.dart';
 import 'package:skimscope/services/facility_service.dart';
 import 'package:skimscope/services/site_service.dart';
@@ -24,6 +25,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
 
   SitesModel currentSite;
   SiteProvider provider;
+  final authService = AuthService();
   @override
   Widget build(BuildContext context) {
     provider = Provider.of<SiteProvider>(context);
@@ -38,8 +40,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
             IconButton(
               icon: FaIcon(FontAwesomeIcons.signOutAlt),
               onPressed: () {
-                FirebaseAuth.instance.signOut().then((value) =>
-                    Navigator.pushReplacementNamed(context, 'login'));
+                authService.signout(context: context);
               },
             ),
             IconButton(

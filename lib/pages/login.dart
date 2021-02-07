@@ -1,6 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:skimscope/model/user_model.dart';
 import 'package:skimscope/providers/user_provider.dart';
 import 'package:skimscope/services/auth_service.dart';
 import 'package:skimscope/widgets/api_loader.dart';
@@ -18,6 +21,38 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   final authService = AuthService();
+
+  @override
+  void initState() {
+    hideShowLoader(true);
+    Future.delayed(Duration.zero, () async {
+      try {
+        var user = FirebaseAuth.instance.currentUser;
+        var db = FirebaseFirestore.instance;
+        if (user != null) {
+          var docSnapshot = await db.doc('users/${user.uid}').get();
+          if (docSnapshot.exists && docSnapshot.data() != null) {
+            UserModel userModel = UserModel.fromFirestore(docSnapshot);
+            var userProvider =
+                Provider.of<UserProvider>(context, listen: false);
+            userProvider.user = userModel;
+            if (userModel != null && userModel.role == 'Admin') {
+              Navigator.pushNamed(context, 'admin');
+            } else if (userModel != null && userModel.role == 'Employee') {
+              Navigator.pushNamed(context, 'employeeH');
+            } else {
+              return;
+            }
+          }
+        }
+        hideShowLoader(false);
+      } catch (err) {
+        hideShowLoader(false);
+        print(err.toString());
+      }
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
