@@ -6,7 +6,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:skimscope/model/equipment_model.dart';
 import 'package:skimscope/model/services_model.dart';
+import 'package:skimscope/services/equipment_service.dart';
 import 'package:skimscope/services/maintenance_service.dart';
+import 'package:skimscope/widgets/api_loader.dart';
 import 'package:skimscope/widgets/service_widget.dart';
 
 class EquipmentDetailPage extends StatefulWidget {
@@ -31,12 +33,35 @@ class _EquipmentDetailPageState extends State<EquipmentDetailPage>
       appBar: AppBar(
         title: Text('${widget.equipment.name}'),
         actions: [
-          CupertinoSwitch(
-              value: widget.equipment.isActive,
-              onChanged: (_) {
-                // setState(() {
-                //   widget.equipment.isActive = _;
-                // });
+          StreamBuilder<bool>(
+              stream: EquipmentService().wathchIsActive(widget.equipment.id),
+              builder: (context, snapshot) {
+                if (snapshot.hasError) return Container();
+                switch (snapshot.connectionState) {
+                  case ConnectionState.waiting:
+                    return CircularProgressIndicator();
+
+                    break;
+                  default:
+                    return CupertinoSwitch(
+                        value: snapshot.data,
+                        onChanged: (_) {
+                          String added = _ ? ' activated' : ' deactivated';
+                          EquipmentService()
+                              .toggleEquipment(_, widget.equipment.id)
+                              .then((value) {
+                            edKey.currentState.hideCurrentSnackBar();
+                            edKey.currentState.showSnackBar(SnackBar(
+                              content: Text('${widget.equipment.name} $added',
+                                  style: GoogleFonts.roboto().copyWith(
+                                      color: _ ? Colors.green : Colors.red)),
+                              backgroundColor: _
+                                  ? Colors.lightGreen.shade100
+                                  : Colors.red.shade100,
+                            ));
+                          });
+                        });
+                }
               }),
           IconButton(
             icon: FaIcon(FontAwesomeIcons.home),
