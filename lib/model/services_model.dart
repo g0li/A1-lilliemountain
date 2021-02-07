@@ -53,7 +53,7 @@ class ServicesModel {
     return ServicesModel(
       id: id,
       equipmentId: data['equipmentId'] ?? '',
-      equipmentName: data['equipmentName'] ?? '',
+      equipmentName: data['equipmentName'] ?? 'x',
       title: data['title'],
       startDate: data['startDate'],
       endDate: data['endDate'] ?? null,
