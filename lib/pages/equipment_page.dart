@@ -90,6 +90,8 @@ class EquipmentPage extends StatelessWidget {
             TextEditingController name = TextEditingController();
             TextEditingController srNo = TextEditingController();
             TextEditingController doI = TextEditingController();
+            GlobalKey<FormState> eFormKey = GlobalKey<FormState>();
+            GlobalKey<ScaffoldState> addEKey = GlobalKey<ScaffoldState>();
             showModalBottomSheet(
                 isDismissible: false,
                 context: context,
@@ -104,11 +106,13 @@ class EquipmentPage extends StatelessWidget {
                       builder: (context, setstate) => Container(
                         height: MediaQuery.of(context).size.height * 0.75,
                         child: Scaffold(
+                          key: addEKey,
                           appBar: AppBar(
                             title: Text('New Equipment'),
                           ),
                           body: SingleChildScrollView(
                             child: Form(
+                              key: eFormKey,
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 28.0, vertical: 16),
@@ -148,6 +152,11 @@ class EquipmentPage extends StatelessWidget {
                                         child: TextFormField(
                                             controller: name,
                                             keyboardType: TextInputType.text,
+                                            validator: (value) {
+                                              if (value.trim().isEmpty)
+                                                return 'Please enter equipment name';
+                                              return null;
+                                            },
                                             decoration: InputDecoration(
                                               labelText: 'Equipment name',
                                               border: OutlineInputBorder(
@@ -163,6 +172,11 @@ class EquipmentPage extends StatelessWidget {
                                         child: TextFormField(
                                             controller: srNo,
                                             keyboardType: TextInputType.text,
+                                            validator: (value) {
+                                              if (value.trim().isEmpty)
+                                                return 'Please enter serial number';
+                                              return null;
+                                            },
                                             decoration: InputDecoration(
                                               labelText: 'S/N',
                                               border: OutlineInputBorder(
@@ -242,8 +256,24 @@ class EquipmentPage extends StatelessWidget {
                                               child: Text('Create'),
                                               onPressed: () {
                                                 // Navigator.pop(context);
-                                                createEquipment(
-                                                    name, srNo, context);
+                                                if (eFormKey.currentState
+                                                        .validate() &&
+                                                    _image != null)
+                                                  createEquipment(
+                                                      name, srNo, context);
+                                                else if (_image == null)
+                                                  addEKey.currentState
+                                                      .showSnackBar(SnackBar(
+                                                    content: Text(
+                                                        'Please provide with equipment image',
+                                                        style: GoogleFonts
+                                                                .roboto()
+                                                            .copyWith(
+                                                                color: Colors
+                                                                    .red)),
+                                                    backgroundColor:
+                                                        Colors.red.shade100,
+                                                  ));
                                               })),
                                     ]),
                               ),
