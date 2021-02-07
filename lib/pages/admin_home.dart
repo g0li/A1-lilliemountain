@@ -36,6 +36,13 @@ class _AdminHomePageState extends State<AdminHomePage> {
           title: Text('Skimscope'),
           actions: [
             IconButton(
+              icon: FaIcon(FontAwesomeIcons.signOutAlt),
+              onPressed: () {
+                FirebaseAuth.instance.signOut().then((value) =>
+                    Navigator.pushReplacementNamed(context, 'login'));
+              },
+            ),
+            IconButton(
               icon: FaIcon(FontAwesomeIcons.hardHat),
               onPressed: () {
                 Navigator.pushNamed(context, 'employee');

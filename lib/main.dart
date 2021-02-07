@@ -11,7 +11,6 @@ import 'package:skimscope/pages/equipment_detail.dart';
 import 'package:skimscope/pages/equipment_page.dart';
 import 'package:skimscope/pages/history.dart';
 import 'package:skimscope/pages/register.dart';
-import 'package:skimscope/pages/scanner.dart';
 import 'package:skimscope/providers/site_provider.dart';
 import 'package:skimscope/providers/user_provider.dart';
 

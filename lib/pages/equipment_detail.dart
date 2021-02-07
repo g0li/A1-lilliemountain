@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:encrypt/encrypt_io.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -11,7 +12,6 @@ import 'package:skimscope/model/services_model.dart';
 import 'package:skimscope/providers/user_provider.dart';
 import 'package:skimscope/services/equipment_service.dart';
 import 'package:skimscope/services/maintenance_service.dart';
-import 'package:skimscope/widgets/api_loader.dart';
 import 'package:skimscope/widgets/service_widget.dart';
 import 'package:encrypt/encrypt.dart' as e;
 
@@ -274,9 +274,10 @@ class _EquipmentDetailPageState extends State<EquipmentDetailPage>
 
   generateQRCODE(EquipmentModel equipment) {
     String id = equipment.id;
-    final key = e.Key.fromLength(32);
-    final iv = e.IV.fromLength(8);
-    final encrypter = e.Encrypter(e.Salsa20(key));
+    final key = e.Key.fromUtf8('5D0A3B28CA2EA8D2F1A4FDBEBB7050DD');
+    final iv = e.IV.fromUtf8('6D73C0D5E94CEC41EC055EDF36CC7F29');
+
+    final encrypter = e.Encrypter(e.AES(key, mode: e.AESMode.cfb64));
     final encrypted = encrypter.encrypt(id, iv: iv);
     showDialog(
         context: context,

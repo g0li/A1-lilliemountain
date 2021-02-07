@@ -84,6 +84,17 @@ class EquipmentService {
     }
   }
 
+  // get single equipments
+  Stream<EquipmentModel> getEquipment(String id) {
+    try {
+      var equipmentRef = db.doc('equipments/$id').snapshots();
+      return equipmentRef.map((event) => EquipmentModel.fromFirestore(event));
+    } catch (err) {
+      print(err.toString());
+      return null;
+    }
+  }
+
   // get all equipments
   Stream<int> getEquipmentCount(FacilitesModel facilityModel) {
     try {

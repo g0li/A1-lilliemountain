@@ -5,6 +5,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:skimscope/model/equipment_model.dart';
 import 'package:skimscope/services/auth_service.dart';
+import 'package:encrypt/encrypt.dart' as e;
+import 'package:skimscope/services/equipment_service.dart';
 
 class EmployeeHomePage extends StatelessWidget {
   EquipmentModel tempEquipment = EquipmentModel(
@@ -96,8 +98,20 @@ class EmployeeHomePage extends StatelessWidget {
                       FlutterBarcodeScanner.scanBarcode(
                               "#ff6666", "Cancel", false, ScanMode.DEFAULT)
                           .then((barcode) {
-                        // Navigator.pushNamed(context, 'edetails',
-                        //     arguments: tempEquipment);
+                        final key =
+                            e.Key.fromUtf8('5D0A3B28CA2EA8D2F1A4FDBEBB7050DD');
+                        final iv =
+                            e.IV.fromUtf8('6D73C0D5E94CEC41EC055EDF36CC7F29');
+
+                        final encrypter =
+                            e.Encrypter(e.AES(key, mode: e.AESMode.cfb64));
+                        final decrypted = encrypter.decrypt64(barcode, iv: iv);
+                        EquipmentService()
+                            .getEquipment(decrypted)
+                            .listen((event) {
+                          Navigator.pushNamed(context, 'edetails',
+                              arguments: event);
+                        });
                       });
                     },
                     child: Padding(
