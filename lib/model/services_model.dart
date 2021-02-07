@@ -46,7 +46,7 @@ class ServicesModel {
 
   static Map<String, dynamic> servicesToJSON(ServicesModel service) {
     return {
-      'equipmentId': service.id,
+      'equipmentId': service.equipmentId,
       'title': service.title,
       'startDate': service.startDate,
       'endDate': service.endDate,
