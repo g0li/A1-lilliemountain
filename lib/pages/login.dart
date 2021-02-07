@@ -164,6 +164,7 @@ class _LoginPageState extends State<LoginPage> {
 
   // show toast
   showToast(String message) {
+    _scaffoldKey.currentState.hideCurrentSnackBar();
     _scaffoldKey.currentState.showSnackBar(SnackBar(
       content: Text(message),
     ));

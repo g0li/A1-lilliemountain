@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:skimscope/model/user_model.dart';
 import 'package:skimscope/services/auth_service.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class EmployeeWidget extends StatefulWidget {
   final Function onTap;
@@ -47,9 +48,12 @@ class _EmployeeWidgetState extends State<EmployeeWidget> {
           borderRadius: BorderRadius.circular(10),
           image: DecorationImage(
             fit: BoxFit.cover,
-            image: NetworkImage(
-              'https://via.placeholder.com/80.png',
+            image: CachedNetworkImageProvider(
+              widget.user.imageUrl ?? 'https://via.placeholder.com/500.png',
             ),
+            //  NetworkImage(
+            //   widget.user.imageUrl ?? 'https://via.placeholder.com/500.png',
+            // ),
           ),
         ),
       ),
@@ -99,6 +103,7 @@ class _EmployeeWidgetState extends State<EmployeeWidget> {
 
   // show toast
   showToast(String message) {
+    widget.scaffoldKey.currentState.hideCurrentSnackBar();
     widget.scaffoldKey.currentState.showSnackBar(SnackBar(
       content: Text(message),
     ));

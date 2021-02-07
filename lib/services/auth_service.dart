@@ -1,16 +1,19 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:skimscope/model/user_model.dart';
 import 'package:skimscope/providers/user_provider.dart';
-import 'dart:convert';
 
 class AuthService {
   final db = FirebaseFirestore.instance;
   final firebaseAuth = FirebaseAuth.instance;
+  var storage = FirebaseStorage.instance;
 
   // Signup
   Future<String> signup({
@@ -142,6 +145,7 @@ class AuthService {
     @required String password,
     @required String name,
     @required DateTime joiningDate,
+    @required String createdBy,
   }) async {
     try {
       final HttpsCallable httpsCallable =
@@ -152,6 +156,7 @@ class AuthService {
         'password': password,
         'name': name,
         'joiningDate': joiningDate.toIso8601String(),
+        'createdBy': createdBy,
       });
 
       var result = res.data;
@@ -243,6 +248,7 @@ class AuthService {
       var empRef = db
           .collection('users')
           .where('role', isEqualTo: 'Employee')
+          .where('createdBy', isEqualTo: firebaseAuth.currentUser.uid)
           .snapshots();
       var list = empRef.map(
           (d) => d.docs.map((doc) => UserModel.fromFirestore(doc)).toList());
@@ -276,6 +282,34 @@ class AuthService {
     } catch (err) {
       print(err.toString());
       return null;
+    }
+  }
+
+  // edit user
+  Future<bool> editUser(
+      {@required String userId,
+      @required String name,
+      @required DateTime joiningDate,
+      bool allowChange = true,
+      File userProfileImage}) async {
+    try {
+      if (userProfileImage != null && allowChange) {
+        String imageUrl = '';
+        var storageRef = storage.ref().child('users').child(userId + '.jpg');
+        await storageRef.putFile(userProfileImage);
+        imageUrl = await storageRef.getDownloadURL();
+        await db.doc('users/$userId').update({
+          'imageUrl': imageUrl != '' ? imageUrl : null,
+        });
+      }
+      await db.doc('users/$userId').update({
+        'name': name,
+        'joiningDate': joiningDate,
+      });
+      return true;
+    } catch (err) {
+      print(err.toString());
+      return false;
     }
   }
 }

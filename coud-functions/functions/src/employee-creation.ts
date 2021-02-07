@@ -8,6 +8,7 @@ export async function employeeCreation(data: any, context: functions.https.Calla
         const userPassword: string = data.password;
         const userName: string = data.name;
         const joiningDate = new Date(data.joiningDate);
+        const createdBy: string = data.createdBy;
 
         const EmployeeTokens = {
             role: 'EMP',
@@ -32,6 +33,7 @@ export async function employeeCreation(data: any, context: functions.https.Calla
             email: userEmail.trim(),
             joiningDate: joiningDate,
             whenCreated: admin.firestore.FieldValue.serverTimestamp(),
+            createdBy: createdBy,
             isActive: true,
         });
 

@@ -150,6 +150,7 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   showToast(String message) {
+    _scaffoldKey.currentState.hideCurrentSnackBar();
     _scaffoldKey.currentState.showSnackBar(SnackBar(
       content: Text(message),
     ));

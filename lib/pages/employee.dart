@@ -1,7 +1,9 @@
+import 'dart:io';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:skimscope/model/user_model.dart';
 import 'package:skimscope/services/auth_service.dart';
@@ -9,6 +11,9 @@ import 'package:skimscope/services/common_service.dart';
 import 'package:skimscope/widgets/api_loader.dart';
 import 'package:skimscope/widgets/employee_widget.dart';
 import 'package:skimscope/widgets/input_formfield_widget.dart';
+import 'package:skimscope/widgets/picker.dart';
+import 'package:provider/provider.dart';
+import '../providers/user_provider.dart';
 
 class EmployeePage extends StatefulWidget {
   @override
@@ -65,7 +70,10 @@ class _EmployeePageState extends State<EmployeePage> {
                         itemBuilder: (context, i) => EmployeeWidget(
                           scaffoldKey: _scaffoldKey,
                           onTap: () {
-                            createEdit(mode: 'edit');
+                            createEdit(
+                              mode: 'edit',
+                              user: userList[i],
+                            );
                           },
                           user: userList[i],
                         ),
@@ -80,11 +88,11 @@ class _EmployeePageState extends State<EmployeePage> {
     );
   }
 
-  createEdit({String mode = 'create'}) {
-    newMethod(mode);
+  createEdit({String mode = 'create', UserModel user}) {
+    newMethod(mode, user);
   }
 
-  Future newMethod(String mode) {
+  Future newMethod(String mode, UserModel user) {
     return showModalBottomSheet(
         context: context,
         isScrollControlled: true,
@@ -93,6 +101,7 @@ class _EmployeePageState extends State<EmployeePage> {
           return EmployeeCreate(
             mode: mode,
             scaffoldKey: _scaffoldKey,
+            user: user,
           );
         }).then((resp) {
       if (resp != null) {
@@ -103,6 +112,7 @@ class _EmployeePageState extends State<EmployeePage> {
 
   // show toast
   showToast(String message) {
+    _scaffoldKey.currentState.hideCurrentSnackBar();
     _scaffoldKey.currentState.showSnackBar(SnackBar(
       content: Text(message),
     ));
@@ -112,7 +122,12 @@ class _EmployeePageState extends State<EmployeePage> {
 class EmployeeCreate extends StatefulWidget {
   final String mode;
   final GlobalKey<ScaffoldState> scaffoldKey;
-  EmployeeCreate({this.mode = 'create', @required this.scaffoldKey});
+  final UserModel user;
+  EmployeeCreate({
+    this.mode = 'create',
+    @required this.scaffoldKey,
+    this.user,
+  });
 
   @override
   _EmployeeCreateState createState() => _EmployeeCreateState();
@@ -130,6 +145,21 @@ class _EmployeeCreateState extends State<EmployeeCreate> {
   final joiningDateController = TextEditingController();
   bool showLoader = false;
   DateTime jd;
+  File selectedFile;
+
+  @override
+  void initState() {
+    if (widget.user != null) {
+      setState(() {
+        nameController.text = widget.user.name;
+        emailController.text = widget.user.email;
+        joiningDateController.text =
+            df.format(widget.user.joiningDate.toDate());
+        jd = widget.user.joiningDate.toDate();
+      });
+    }
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -139,7 +169,9 @@ class _EmployeeCreateState extends State<EmployeeCreate> {
         key: _scaffoldKey,
         appBar: AppBar(
           automaticallyImplyLeading: !showLoader,
-          title: Text('New Employee'),
+          title: Text(
+            widget.mode == 'create' ? 'New Employee' : '${widget.user.name}',
+          ),
         ),
         body: SingleChildScrollView(
           child: Form(
@@ -151,25 +183,9 @@ class _EmployeeCreateState extends State<EmployeeCreate> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if (widget.mode != 'create')
-                      Center(
-                        child: Container(
-                          alignment: Alignment.center,
-                          height: 200,
-                          child: FaIcon(
-                            FontAwesomeIcons.camera,
-                            color: Colors.grey,
-                            size: 50,
-                          ),
-                          width: 200,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(40),
-                            image: DecorationImage(
-                              image: NetworkImage(
-                                'https://via.placeholder.com/500.png',
-                              ),
-                            ),
-                          ),
-                        ),
+                      FilePicker(
+                        imagePickedFunction: _pickedImage,
+                        imgUrl: widget.user.imageUrl,
                       ),
                     Padding(
                       padding: EdgeInsets.all(8),
@@ -185,38 +201,40 @@ class _EmployeeCreateState extends State<EmployeeCreate> {
                         },
                       ),
                     ),
-                    Padding(
-                      padding: EdgeInsets.all(8),
-                      child: InputFormField(
-                        controller: emailController,
-                        labelText: 'email',
-                        keyboardType: TextInputType.emailAddress,
-                        validatorFn: (String val) {
-                          if (val.trim().isEmpty) {
-                            return 'email is required';
-                          }
-                          return null;
-                        },
+                    if (widget.mode == 'create')
+                      Padding(
+                        padding: EdgeInsets.all(8),
+                        child: InputFormField(
+                          controller: emailController,
+                          labelText: 'email',
+                          keyboardType: TextInputType.emailAddress,
+                          validatorFn: (String val) {
+                            if (val.trim().isEmpty) {
+                              return 'email is required';
+                            }
+                            return null;
+                          },
+                        ),
                       ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8),
-                      child: InputFormField(
-                        controller: passwordController,
-                        labelText: 'password',
-                        keyboardType: TextInputType.visiblePassword,
-                        isPassword: true,
-                        validatorFn: (String val) {
-                          if (val.trim().isEmpty) {
-                            return 'password is required';
-                          }
-                          if (val.trim().length < 6) {
-                            return 'Minimum password length must be 6 characters';
-                          }
-                          return null;
-                        },
+                    if (widget.mode == 'create')
+                      Padding(
+                        padding: EdgeInsets.all(8),
+                        child: InputFormField(
+                          controller: passwordController,
+                          labelText: 'password',
+                          keyboardType: TextInputType.visiblePassword,
+                          isPassword: true,
+                          validatorFn: (String val) {
+                            if (val.trim().isEmpty) {
+                              return 'password is required';
+                            }
+                            if (val.trim().length < 6) {
+                              return 'Minimum password length must be 6 characters';
+                            }
+                            return null;
+                          },
+                        ),
                       ),
-                    ),
                     Padding(
                       padding: EdgeInsets.all(8),
                       child: InputFormField(
@@ -243,9 +261,15 @@ class _EmployeeCreateState extends State<EmployeeCreate> {
                         child: CupertinoButton(
                           color: Theme.of(context).primaryColor,
                           borderRadius: BorderRadius.circular(30),
-                          child: Text('Create'),
+                          child: Text(
+                            widget.mode == 'create'
+                                ? 'New Employee'
+                                : 'Save Changes',
+                          ),
                           onPressed: () {
-                            onCreateEmployee(context);
+                            widget.mode == 'create'
+                                ? onCreateEmployee()
+                                : onEditEmployee();
                           },
                         ),
                       ),
@@ -266,6 +290,7 @@ class _EmployeeCreateState extends State<EmployeeCreate> {
 
   // show toast
   showToast(String message) {
+    _scaffoldKey.currentState.hideCurrentSnackBar();
     _scaffoldKey.currentState.showSnackBar(SnackBar(
       content: Text(message),
     ));
@@ -287,7 +312,7 @@ class _EmployeeCreateState extends State<EmployeeCreate> {
   }
 
   // on create
-  onCreateEmployee(BuildContext ctx) async {
+  onCreateEmployee() async {
     if (_formKey.currentState.validate()) {
       FocusScope.of(context).unfocus();
       hideShowLoader(true);
@@ -300,6 +325,7 @@ class _EmployeeCreateState extends State<EmployeeCreate> {
         joiningDate: jd,
         name: name,
         password: password,
+        createdBy: FirebaseAuth.instance.currentUser.uid,
       );
 
       hideShowLoader(false);
@@ -311,6 +337,31 @@ class _EmployeeCreateState extends State<EmployeeCreate> {
       } else {
         Navigator.pop(context, response);
       }
+    }
+  }
+
+  void _pickedImage(File image) {
+    if (image == null) return;
+    setState(() {
+      selectedFile = image;
+    });
+  }
+
+  onEditEmployee() async {
+    hideShowLoader(true);
+    var usrName = nameController.text;
+    var res = await authService.editUser(
+        joiningDate: jd,
+        name: usrName,
+        userId: widget.user.id,
+        userProfileImage: selectedFile,
+        allowChange: selectedFile != null);
+    hideShowLoader(false);
+    if (res) {
+      _formKey.currentState.reset();
+      Navigator.pop(context, 'Success');
+    } else {
+      Navigator.pop(context, 'Some error occured, Please try again later');
     }
   }
 }

@@ -7,6 +7,7 @@ class UserModel {
   final String email;
   final dynamic joiningDate;
   final bool isActive;
+  final String imageUrl;
   final Timestamp whenCreated;
   final dynamic whenModified;
 
@@ -19,6 +20,7 @@ class UserModel {
     this.isActive,
     this.whenCreated,
     this.whenModified,
+    this.imageUrl,
   });
 
   factory UserModel.fromFirestore(DocumentSnapshot doc) {
@@ -31,6 +33,7 @@ class UserModel {
       email: data['email'],
       joiningDate: data['joiningDate'],
       isActive: data['isActive'],
+      imageUrl: data['imageUrl'] ?? null,
       whenCreated: data['whenCreated'],
       whenModified: data['whenModified'] ?? null,
     );
