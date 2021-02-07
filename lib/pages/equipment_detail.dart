@@ -9,19 +9,27 @@ import 'package:skimscope/model/services_model.dart';
 import 'package:skimscope/services/maintenance_service.dart';
 import 'package:skimscope/widgets/service_widget.dart';
 
-class EquipmentDetailPage extends StatelessWidget {
+class EquipmentDetailPage extends StatefulWidget {
   EquipmentModel equipment;
 
   EquipmentDetailPage({Key key, this.equipment}) : super(key: key);
 
   @override
+  _EquipmentDetailPageState createState() => _EquipmentDetailPageState();
+}
+
+class _EquipmentDetailPageState extends State<EquipmentDetailPage>
+    with TickerProviderStateMixin {
+  bool isLive = true;
+  var pc = PageController(initialPage: 0);
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('${equipment.name}'),
+        title: Text('${widget.equipment.name}'),
         actions: [
           CupertinoSwitch(
-              value: equipment.isActive,
+              value: widget.equipment.isActive,
               onChanged: (_) {
                 // setState(() {
                 //   widget.equipment.isActive = _;
@@ -43,7 +51,8 @@ class EquipmentDetailPage extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pushNamed(context, 'ceservice', arguments: equipment);
+          Navigator.pushNamed(context, 'ceservice',
+              arguments: widget.equipment);
         },
         backgroundColor: Color(0xFFC8553D),
         child: FaIcon(
@@ -67,7 +76,7 @@ class EquipmentDetailPage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(40),
                     image: DecorationImage(
                       image: NetworkImage(
-                        equipment.imageUrl,
+                        widget.equipment.imageUrl,
                       ),
                     ),
                   ),
@@ -77,12 +86,12 @@ class EquipmentDetailPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    equipment.srNo,
+                    widget.equipment.srNo,
                     style: GoogleFonts.roboto()
                         .copyWith(color: Colors.black, fontSize: 12),
                   ),
                   Text(
-                      'doi :${(equipment.installationDate as Timestamp).toDate().toString().split(' ')[0]}',
+                      'doi :${(widget.equipment.installationDate as Timestamp).toDate().toString().split(' ')[0]}',
                       style: GoogleFonts.roboto().copyWith(
                           color: Color(0xFF5C5C5C),
                           fontSize: 12,
@@ -92,7 +101,7 @@ class EquipmentDetailPage extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(equipment.name,
+                  Text(widget.equipment.name,
                       style: GoogleFonts.roboto().copyWith(
                           color: Colors.black,
                           fontSize: 16,
@@ -102,14 +111,43 @@ class EquipmentDetailPage extends StatelessWidget {
                       onPressed: () {})
                 ],
               ),
-              Text('${equipment.siteId.name} / ${equipment.facilityId.name}',
+              Text(
+                  '${widget.equipment.siteId.name} / ${widget.equipment.facilityId.name}',
                   style: GoogleFonts.roboto().copyWith(
                       color: Color(0xFF5C5C5C),
                       fontSize: 12,
                       fontWeight: FontWeight.w500)),
+              Divider(),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Row(
+                  children: [
+                    Flexible(
+                        flex: 1,
+                        fit: FlexFit.tight,
+                        child: FlatButton(
+                          textColor: Colors.green,
+                          child: Text('LIVE'),
+                          onPressed: () {
+                            pc.jumpToPage(0);
+                          },
+                        )),
+                    Flexible(
+                        flex: 1,
+                        fit: FlexFit.tight,
+                        child: FlatButton(
+                          textColor: Colors.red,
+                          child: Text('CLOSED'),
+                          onPressed: () {
+                            pc.jumpToPage(1);
+                          },
+                        ))
+                  ],
+                ),
+              ),
               StreamBuilder<List<ServicesModel>>(
                   stream: MaintenanceService()
-                      .getEquipmentServices(equipmentId: equipment.id),
+                      .getEquipmentServices(equipmentId: widget.equipment.id),
                   builder: (context, snapshot) {
                     if (snapshot.hasError)
                       return Text(snapshot.error.toString());
@@ -133,30 +171,54 @@ class EquipmentDetailPage extends StatelessWidget {
                         break;
                       default:
                         List<ServicesModel> history = snapshot.data;
-
-                        return history.length > 0
-                            ? Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Divider(),
-                                  Text('history',
-                                      style: GoogleFonts.roboto().copyWith(
-                                          color: Color(0xFF5C5C5C),
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w500)),
-                                  ListView.separated(
-                                    shrinkWrap: true,
-                                    primary: false,
-                                    itemBuilder: (context, i) =>
-                                        ServiceWidget(history[i]),
-                                    itemCount: history.length,
-                                    separatorBuilder:
-                                        (BuildContext context, int index) =>
-                                            Divider(),
-                                  ),
-                                ],
-                              )
-                            : Container();
+                        List<ServicesModel> live = snapshot.data
+                            .where((element) => element.endDate == null)
+                            .toList();
+                        List<ServicesModel> closed = snapshot.data
+                            .where((element) => element.endDate != null)
+                            .toList();
+                        if (history.length > 0) {
+                          return Container(
+                            height: 300,
+                            child: PageView(
+                              controller: pc,
+                              children: [
+                                live.length > 0
+                                    ? ListView.separated(
+                                        shrinkWrap: true,
+                                        primary: false,
+                                        itemBuilder: (context, i) =>
+                                            ServiceWidget(live[i]),
+                                        itemCount: live.length,
+                                        separatorBuilder:
+                                            (BuildContext context, int index) =>
+                                                Divider(),
+                                      )
+                                    : Center(
+                                        child: Text(
+                                            'No Live Services for ${widget.equipment.name}'),
+                                      ),
+                                closed.length > 0
+                                    ? ListView.separated(
+                                        shrinkWrap: true,
+                                        primary: false,
+                                        itemBuilder: (context, i) =>
+                                            ServiceWidget(closed[i]),
+                                        itemCount: closed.length,
+                                        separatorBuilder:
+                                            (BuildContext context, int index) =>
+                                                Divider(),
+                                      )
+                                    : Center(
+                                        child: Text(
+                                            'No closed Services for ${widget.equipment.name}'),
+                                      ),
+                              ],
+                            ),
+                          );
+                        } else {
+                          return Container();
+                        }
                     }
                   })
             ],
