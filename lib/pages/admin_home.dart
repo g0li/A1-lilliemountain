@@ -149,6 +149,13 @@ class _AdminHomePageState extends State<AdminHomePage> {
                                 });
                         }),
                   ),
+            Text(
+              'Facilities',
+              style: GoogleFonts.roboto().copyWith(
+                  fontWeight: FontWeight.w900,
+                  color: Theme.of(context).primaryColor,
+                  fontSize: 24),
+            ),
             StreamBuilder<List<FacilitesModel>>(
                 stream: FacilityService().getAllFacilities(),
                 builder: (context, snapshot) {
@@ -221,7 +228,8 @@ class _AdminHomePageState extends State<AdminHomePage> {
                                   ),
                                   subtitle: StreamBuilder<int>(
                                       stream: EquipmentService()
-                                          .getEquipmentCount(currentSiteData[i]),
+                                          .getEquipmentCount(
+                                              currentSiteData[i]),
                                       builder: (context, snapshotI) {
                                         if (snapshotI.hasError) return Text('');
                                         switch (snapshotI.connectionState) {
