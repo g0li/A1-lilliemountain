@@ -20,7 +20,8 @@ class _HistoryPageState extends State<HistoryPage> {
           IconButton(
             icon: FaIcon(FontAwesomeIcons.home),
             onPressed: () {
-              // Navigator.pushNamed(context, 'employee');
+              Navigator.of(context)
+                  .pushNamedAndRemoveUntil('employeeH', (route) => false);
             },
           )
         ],

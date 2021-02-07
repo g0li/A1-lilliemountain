@@ -130,12 +130,14 @@ class AuthService {
       var userProvider = Provider.of<UserProvider>(context, listen: false);
       userProvider.user = null;
       await firebaseAuth.signOut();
+      Navigator.of(context).pushNamedAndRemoveUntil('login', (route) => false);
     } catch (err) {
       print(err.toString());
       await firebaseAuth.signOut();
       var userProvider = Provider.of<UserProvider>(context, listen: false);
       userProvider.user = null;
       await firebaseAuth.signOut();
+      Navigator.of(context).pushNamedAndRemoveUntil('login', (route) => false);
     }
   }
 
