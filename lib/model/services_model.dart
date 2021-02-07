@@ -4,6 +4,7 @@ import 'package:skimscope/model/facilities_model.dart';
 class ServicesModel {
   final String id;
   final String equipmentId;
+  final String equipmentName;
   final String title;
   final Timestamp startDate;
   final DateTime endDate;
@@ -16,6 +17,7 @@ class ServicesModel {
   ServicesModel({
     this.id,
     this.equipmentId,
+    this.equipmentName,
     this.title,
     this.startDate,
     this.endDate,
@@ -33,6 +35,7 @@ class ServicesModel {
     return ServicesModel(
       id: id,
       equipmentId: data['equipmentId'] ?? '',
+      equipmentName: data['equipmentName'] ?? '',
       title: data['title'],
       startDate: data['startDate'],
       endDate: data['endDate'] ?? null,

@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:skimscope/model/equipment_model.dart';
 import 'package:skimscope/pages/admin_home.dart';
 import 'package:skimscope/pages/create_service.dart';
 import 'package:skimscope/pages/employee_home.dart';
@@ -57,8 +58,17 @@ class MyApp extends StatelessWidget {
                         equipment: settings.arguments,
                       ));
             case 'ceservice':
-              return CupertinoPageRoute(
-                  builder: (_) => CreateEditServicePage(settings.arguments));
+              return CupertinoPageRoute(builder: (_) {
+                if (settings.arguments is EquipmentModel)
+                  return CreateEditServicePage(
+                    equipment: settings.arguments,
+                  );
+                else
+                  return CreateEditServicePage(
+                    servicesModel: settings.arguments,
+                  );
+              });
+
             case 'employee':
               return CupertinoPageRoute(builder: (_) => EmployeePage());
             case 'employeeH':

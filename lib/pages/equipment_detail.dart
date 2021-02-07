@@ -148,7 +148,7 @@ class EquipmentDetailPage extends StatelessWidget {
                                     shrinkWrap: true,
                                     primary: false,
                                     itemBuilder: (context, i) =>
-                                        ServiceWidget(),
+                                        ServiceWidget(history[i]),
                                     itemCount: history.length,
                                     separatorBuilder:
                                         (BuildContext context, int index) =>

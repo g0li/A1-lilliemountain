@@ -236,6 +236,18 @@ class AuthService {
     }
   }
 
+  // Get single user
+  Stream<UserModel> getUser(id) {
+    try {
+      var empRef = db.doc('users/$id').snapshots();
+      var usr = empRef.map((event) => UserModel.fromFirestore(event));
+      return usr;
+    } catch (err) {
+      print(err.toString());
+      return null;
+    }
+  }
+
   // Get all admins
   Stream<List<UserModel>> getAllAdmins() {
     try {

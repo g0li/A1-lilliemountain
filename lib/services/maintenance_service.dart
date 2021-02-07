@@ -9,6 +9,7 @@ class MaintenanceService {
   // create & edit service
   Future<bool> createService({
     @required String equipmentId,
+    @required String equipmentName,
     @required String title,
     @required DateTime startDate,
     @required DateTime endDate,
@@ -21,6 +22,7 @@ class MaintenanceService {
     try {
       ServicesModel service = ServicesModel(
         equipmentId: equipmentId,
+        equipmentName: equipmentName,
         title: title,
         startDate: Timestamp.fromDate(startDate),
         endDate: endDate,
