@@ -7,7 +7,7 @@ class ServicesModel {
   final String equipmentName;
   final String title;
   final Timestamp startDate;
-  final DateTime endDate;
+  final Timestamp endDate;
   final FacilitesModel facility;
   final String notes;
   final String createdBy;

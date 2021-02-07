@@ -25,7 +25,7 @@ class MaintenanceService {
         equipmentName: equipmentName,
         title: title,
         startDate: Timestamp.fromDate(startDate),
-        endDate: endDate,
+        endDate: Timestamp.fromDate(endDate),
         facility: facility,
         createdBy: createdBy,
         notes: notes,
@@ -40,13 +40,12 @@ class MaintenanceService {
           'title': title,
           'startDate': startDate,
           'endDate': endDate,
-          'facility': facility,
+          'facility': FacilitesModel.facilityToJSon(facility),
           'notes': notes,
           'whenModified': Timestamp.now(),
         });
       } else {
         // create mode
-        print('this');
         await db
             .collection('equipments/$equipmentId/services')
             .add(ServicesModel.servicesToJSON(service));

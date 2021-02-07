@@ -22,9 +22,12 @@ class _EquipmentDetailPageState extends State<EquipmentDetailPage>
     with TickerProviderStateMixin {
   bool isLive = true;
   var pc = PageController(initialPage: 0);
+  GlobalKey<ScaffoldState> edKey = GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: edKey,
       appBar: AppBar(
         title: Text('${widget.equipment.name}'),
         actions: [
@@ -188,7 +191,10 @@ class _EquipmentDetailPageState extends State<EquipmentDetailPage>
                                         shrinkWrap: true,
                                         primary: false,
                                         itemBuilder: (context, i) =>
-                                            ServiceWidget(live[i]),
+                                            ServiceWidget(
+                                          servicesModel: live[i],
+                                          globalKey: edKey,
+                                        ),
                                         itemCount: live.length,
                                         separatorBuilder:
                                             (BuildContext context, int index) =>
@@ -203,7 +209,10 @@ class _EquipmentDetailPageState extends State<EquipmentDetailPage>
                                         shrinkWrap: true,
                                         primary: false,
                                         itemBuilder: (context, i) =>
-                                            ServiceWidget(closed[i]),
+                                            ServiceWidget(
+                                          servicesModel: closed[i],
+                                          globalKey: edKey,
+                                        ),
                                         itemCount: closed.length,
                                         separatorBuilder:
                                             (BuildContext context, int index) =>

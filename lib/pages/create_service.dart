@@ -279,6 +279,7 @@ class CreateEditServicePage extends StatelessWidget {
                             barrierDismissible: false);
                         MaintenanceService()
                             .createService(
+                                mode: 'update',
                                 equipmentId: equipment.id,
                                 equipmentName: equipment.name,
                                 title: title.text,
