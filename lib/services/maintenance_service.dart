@@ -11,8 +11,8 @@ class MaintenanceService {
     @required String equipmentId,
     @required String equipmentName,
     @required String title,
-    @required DateTime startDate,
-    @required DateTime endDate,
+    @required Timestamp startDate,
+    @required Timestamp endDate,
     @required dynamic facility,
     @required String createdBy,
     @required String notes,
@@ -20,12 +20,13 @@ class MaintenanceService {
     String serviceId,
   }) async {
     try {
+      print('asdasd');
       ServicesModel service = ServicesModel(
         equipmentId: equipmentId,
         equipmentName: equipmentName,
         title: title,
-        startDate: Timestamp.fromDate(startDate),
-        endDate: Timestamp.fromDate(endDate),
+        startDate: startDate,
+        endDate: endDate,
         facility: facility,
         createdBy: createdBy,
         notes: notes,

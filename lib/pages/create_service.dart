@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -135,7 +136,7 @@ class CreateEditServicePage extends StatelessWidget {
                                 equipmentId: equipment.id,
                                 title: title.text,
                                 equipmentName: equipment.name,
-                                startDate: DateTime.now(),
+                                startDate: Timestamp.now(),
                                 endDate: null,
                                 facility: equipment.facilityId,
                                 createdBy:
@@ -147,6 +148,7 @@ class CreateEditServicePage extends StatelessWidget {
                           value
                               ? cesKey.currentState
                                   .showSnackBar(SnackBar(
+                                    duration: Duration(milliseconds: 500),
                                     content: Text('Service Added',
                                         style: GoogleFonts.roboto()
                                             .copyWith(color: Colors.green)),
@@ -157,6 +159,7 @@ class CreateEditServicePage extends StatelessWidget {
                                       Navigator.pop(context)) //issue here
                               : cesKey.currentState
                                   .showSnackBar(SnackBar(
+                                    duration: Duration(milliseconds: 500),
                                     content: Text('Something went wrong',
                                         style: GoogleFonts.roboto()
                                             .copyWith(color: Colors.red)),
@@ -284,12 +287,13 @@ class CreateEditServicePage extends StatelessWidget {
                           MaintenanceService()
                               .createService(
                                   mode: 'update',
-                                  equipmentId: equipment.id,
-                                  equipmentName: equipment.name,
+                                  serviceId: servicesModel.id,
+                                  equipmentId: servicesModel.equipmentId,
+                                  equipmentName: servicesModel.equipmentName,
                                   title: title.text,
-                                  startDate: DateTime.now(),
+                                  startDate: servicesModel.startDate,
                                   endDate: null,
-                                  facility: equipment.facilityId,
+                                  facility: servicesModel.facility,
                                   createdBy:
                                       FirebaseAuth.instance.currentUser.uid,
                                   notes: notes.text)
@@ -299,7 +303,8 @@ class CreateEditServicePage extends StatelessWidget {
                             value
                                 ? cesKey.currentState
                                     .showSnackBar(SnackBar(
-                                      content: Text('Service Added',
+                                      duration: Duration(milliseconds: 500),
+                                      content: Text('Service Updated',
                                           style: GoogleFonts.roboto()
                                               .copyWith(color: Colors.green)),
                                       backgroundColor:
@@ -310,6 +315,7 @@ class CreateEditServicePage extends StatelessWidget {
                                         Navigator.pop(context)) //issue here
                                 : cesKey.currentState
                                     .showSnackBar(SnackBar(
+                                      duration: Duration(milliseconds: 500),
                                       content: Text('Something went wrong',
                                           style: GoogleFonts.roboto()
                                               .copyWith(color: Colors.red)),
