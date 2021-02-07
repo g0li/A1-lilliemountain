@@ -1,3 +1,4 @@
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +18,10 @@ import 'pages/splash.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  var app = await Firebase.initializeApp();
+  // FirebaseFunctions.instanceFor(region: 'asia-east2', app: app)
+  //     .useFunctionsEmulator(
+  //         origin: 'https://asia-east2-skimscope.cloudfunctions.net');
   runApp(MyApp());
 }
 

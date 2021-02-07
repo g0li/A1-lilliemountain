@@ -7,7 +7,7 @@ export async function employeeCreation(data: any, context: functions.https.Calla
         const userEmail: string = data.email;
         const userPassword: string = data.password;
         const userName: string = data.name;
-        const joiningDate: any = data.joiningDate;
+        const joiningDate = new Date(data.joiningDate);
 
         const EmployeeTokens = {
             role: 'EMP',

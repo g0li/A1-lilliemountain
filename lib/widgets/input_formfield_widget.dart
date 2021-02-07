@@ -6,6 +6,8 @@ class InputFormField extends StatelessWidget {
   final TextInputType keyboardType;
   final bool isPassword;
   final TextEditingController controller;
+  final Function onTapFn;
+  final bool readOnly;
 
   InputFormField({
     @required this.labelText,
@@ -13,6 +15,8 @@ class InputFormField extends StatelessWidget {
     this.keyboardType = TextInputType.text,
     this.isPassword = false,
     @required this.controller,
+    this.onTapFn,
+    this.readOnly = false,
   });
 
   @override
@@ -22,6 +26,8 @@ class InputFormField extends StatelessWidget {
       keyboardType: TextInputType.text,
       validator: validatorFn,
       controller: controller,
+      onTap: onTapFn,
+      readOnly: readOnly,
       decoration: InputDecoration(
         labelText: labelText,
         border: OutlineInputBorder(

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:skimscope/model/user_model.dart';
 import 'package:skimscope/providers/user_provider.dart';
+import 'dart:convert';
 
 class AuthService {
   final db = FirebaseFirestore.instance;
@@ -143,13 +144,14 @@ class AuthService {
     @required DateTime joiningDate,
   }) async {
     try {
-      final httpsCallable = FirebaseFunctions.instanceFor(region: 'asia-east2')
-          .httpsCallable('addEmployeeAccount');
-      dynamic res = await httpsCallable.call(<String, dynamic>{
-        'email': email.trim(),
-        'password': password.trim(),
-        'name': name.trim(),
-        'joiningDate': joiningDate
+      final HttpsCallable httpsCallable =
+          FirebaseFunctions.instance.httpsCallable('addEmployeeAccount');
+
+      dynamic res = await httpsCallable({
+        'email': email,
+        'password': password,
+        'name': name,
+        'joiningDate': joiningDate.toIso8601String(),
       });
 
       var result = res.data;
@@ -158,7 +160,14 @@ class AuthService {
       if (result['status'] == 1) {
         return 'User creation successful';
       } else {
-        return 'Some error occured, Please try again later';
+        var errorMessage = 'Some error occured, please try again later';
+        if (result != null &&
+            result['error'] != null &&
+            result['error']['errorInfo'] != null &&
+            result['error']['errorInfo']['message'] != null) {
+          errorMessage = result['error']['errorInfo']['message'];
+        }
+        return errorMessage;
       }
     } catch (err) {
       print('Error creating employee account: ${err.toString()}');
@@ -167,14 +176,14 @@ class AuthService {
   }
 
   // change employee password
-  Future<bool> changeEmployeePassword({
+  Future<String> changeEmployeePassword({
     @required String userId,
     @required String password,
   }) async {
     try {
-      final httpsCallable = FirebaseFunctions.instanceFor(region: 'asia-east2')
-          .httpsCallable('changeEmpPassword');
-      dynamic res = await httpsCallable.call(<String, dynamic>{
+      final httpsCallable =
+          FirebaseFunctions.instance.httpsCallable('changeEmpPassword');
+      dynamic res = await httpsCallable(<String, dynamic>{
         'userId': userId,
         'password': password.trim(),
       });
@@ -183,13 +192,21 @@ class AuthService {
       print(result.toString());
 
       if (result['status'] == 1) {
-        return true;
+        return 'Success';
       } else {
-        return false;
+        return 'Some error occured, please try again later';
       }
     } catch (err) {
       print('Error in change password: ${err.toString()}');
-      return false;
+      var errorMessage = 'Some error occured, please try again later';
+      if (err != null &&
+          err['error'] != null &&
+          err['error']['errorInfo'] != null &&
+          err['error']['errorInfo']['message'] != null) {
+        errorMessage = err['error']['errorInfo']['message'];
+      }
+      print('Error in modify Employee account: ${err.toString()}');
+      return errorMessage;
     }
   }
 
@@ -199,9 +216,9 @@ class AuthService {
     @required String userId,
   }) async {
     try {
-      final httpsCallable = FirebaseFunctions.instanceFor(region: 'asia-east2')
-          .httpsCallable('modifyUser');
-      dynamic res = await httpsCallable.call(<String, dynamic>{
+      final httpsCallable =
+          FirebaseFunctions.instance.httpsCallable('modifyUser');
+      dynamic res = await httpsCallable(<String, dynamic>{
         'userId': userId,
         'isActive': isActive,
       });
