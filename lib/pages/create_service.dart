@@ -196,6 +196,7 @@ class CreateEditServicePage extends StatelessWidget {
                   child: TextFormField(
                       controller: title,
                       keyboardType: TextInputType.text,
+                      enabled: servicesModel.endDate == null,
                       decoration: InputDecoration(
                         labelText: 'title',
                         border: OutlineInputBorder(
@@ -208,6 +209,7 @@ class CreateEditServicePage extends StatelessWidget {
                   padding: EdgeInsets.all(8),
                   child: TextFormField(
                       controller: notes,
+                      enabled: servicesModel.endDate == null,
                       keyboardType: TextInputType.multiline,
                       minLines: 2,
                       maxLines: 6,
@@ -258,64 +260,68 @@ class CreateEditServicePage extends StatelessWidget {
                                 BorderSide(color: Colors.black, width: 2)),
                       )),
                 ),
-                Container(
-                    width: MediaQuery.of(context).size.width,
-                    padding: EdgeInsets.all(8),
-                    child: CupertinoButton(
-                      color: Theme.of(context).primaryColor,
-                      borderRadius: BorderRadius.circular(30),
-                      child: Text('Update'),
-                      onPressed: () {
-                        // Navigator.pop(context);
-                        showDialog(
-                            context: context,
-                            builder: (context) => Center(
-                                  child: SizedBox(
-                                    child: CircularProgressIndicator(),
-                                    height: 40,
-                                    width: 40,
+                Visibility(
+                  visible: servicesModel.endDate == null,
+                  child: Container(
+                      width: MediaQuery.of(context).size.width,
+                      padding: EdgeInsets.all(8),
+                      child: CupertinoButton(
+                        color: Theme.of(context).primaryColor,
+                        borderRadius: BorderRadius.circular(30),
+                        child: Text('Update'),
+                        onPressed: () {
+                          // Navigator.pop(context);
+                          showDialog(
+                              context: context,
+                              builder: (context) => Center(
+                                    child: SizedBox(
+                                      child: CircularProgressIndicator(),
+                                      height: 40,
+                                      width: 40,
+                                    ),
                                   ),
-                                ),
-                            barrierDismissible: false);
-                        MaintenanceService()
-                            .createService(
-                                mode: 'update',
-                                equipmentId: equipment.id,
-                                equipmentName: equipment.name,
-                                title: title.text,
-                                startDate: DateTime.now(),
-                                endDate: null,
-                                facility: equipment.facilityId,
-                                createdBy:
-                                    FirebaseAuth.instance.currentUser.uid,
-                                notes: notes.text)
-                            .then((value) {
-                          Navigator.pop(context);
+                              barrierDismissible: false);
+                          MaintenanceService()
+                              .createService(
+                                  mode: 'update',
+                                  equipmentId: equipment.id,
+                                  equipmentName: equipment.name,
+                                  title: title.text,
+                                  startDate: DateTime.now(),
+                                  endDate: null,
+                                  facility: equipment.facilityId,
+                                  createdBy:
+                                      FirebaseAuth.instance.currentUser.uid,
+                                  notes: notes.text)
+                              .then((value) {
+                            Navigator.pop(context);
 
-                          value
-                              ? cesKey.currentState
-                                  .showSnackBar(SnackBar(
-                                    content: Text('Service Added',
-                                        style: GoogleFonts.roboto()
-                                            .copyWith(color: Colors.green)),
-                                    backgroundColor: Colors.lightGreen.shade100,
-                                  ))
-                                  .closed
-                                  .then((value) =>
-                                      Navigator.pop(context)) //issue here
-                              : cesKey.currentState
-                                  .showSnackBar(SnackBar(
-                                    content: Text('Something went wrong',
-                                        style: GoogleFonts.roboto()
-                                            .copyWith(color: Colors.red)),
-                                    backgroundColor: Colors.red.shade100,
-                                  ))
-                                  .closed
-                                  .then((value) =>
-                                      Navigator.pop(context)); //issue here
-                        });
-                      },
-                    )),
+                            value
+                                ? cesKey.currentState
+                                    .showSnackBar(SnackBar(
+                                      content: Text('Service Added',
+                                          style: GoogleFonts.roboto()
+                                              .copyWith(color: Colors.green)),
+                                      backgroundColor:
+                                          Colors.lightGreen.shade100,
+                                    ))
+                                    .closed
+                                    .then((value) =>
+                                        Navigator.pop(context)) //issue here
+                                : cesKey.currentState
+                                    .showSnackBar(SnackBar(
+                                      content: Text('Something went wrong',
+                                          style: GoogleFonts.roboto()
+                                              .copyWith(color: Colors.red)),
+                                      backgroundColor: Colors.red.shade100,
+                                    ))
+                                    .closed
+                                    .then((value) =>
+                                        Navigator.pop(context)); //issue here
+                          });
+                        },
+                      )),
+                ),
               ],
             ),
           ),
