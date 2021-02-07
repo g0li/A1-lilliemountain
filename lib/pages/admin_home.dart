@@ -64,7 +64,7 @@ class _AdminHomePageState extends State<AdminHomePage> {
                     color: Theme.of(context).primaryColor,
                     fontSize: 24),
               ),
-              (provider.allSites.length < 1)
+              (provider.sitesLoader)
                   ? Container(
                       height: 120,
                       margin: EdgeInsets.symmetric(vertical: 8),
