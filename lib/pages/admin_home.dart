@@ -3,21 +3,30 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:skimscope/model/facilities_model.dart';
 import 'package:skimscope/model/sites_model.dart';
+import 'package:skimscope/providers/site_provider.dart';
 import 'package:skimscope/services/equipment_service.dart';
 import 'package:skimscope/services/facility_service.dart';
 import 'package:skimscope/services/site_service.dart';
 import 'package:skimscope/widgets/site_widget.dart';
 
-class AdminHomePage extends StatelessWidget {
-  List<SitesModel> sites = List<SitesModel>();
+class AdminHomePage extends StatefulWidget {
+  @override
+  _AdminHomePageState createState() => _AdminHomePageState();
+}
+
+class _AdminHomePageState extends State<AdminHomePage> {
   GlobalKey<ScaffoldState> adminKey =
       GlobalKey<ScaffoldState>(debugLabel: 'aK');
+
   SitesModel currentSite;
+  SiteProvider provider;
   @override
   Widget build(BuildContext context) {
+    provider = Provider.of<SiteProvider>(context);
     return Scaffold(
       key: adminKey,
       appBar: AppBar(
@@ -44,116 +53,102 @@ class AdminHomePage extends StatelessWidget {
                   color: Theme.of(context).primaryColor,
                   fontSize: 24),
             ),
-            StreamBuilder<List<SitesModel>>(
-                stream: SiteService().getAllSites(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasError) return Text('Something went wrong');
-                  switch (snapshot.connectionState) {
-                    case ConnectionState.waiting:
-                      return Container(
-                        height: 120,
-                        margin: EdgeInsets.symmetric(vertical: 8),
-                        width: MediaQuery.of(context).size.width,
-                        child: ListView.builder(
-                            primary: false,
-                            shrinkWrap: true,
-                            scrollDirection: Axis.horizontal,
-                            itemCount: 5,
-                            itemBuilder: (context, i) {
-                              return Shimmer.fromColors(
-                                baseColor: Colors.grey.shade300,
-                                highlightColor: Colors.grey.shade50,
-                                child: Column(
-                                  children: [
-                                    Container(
-                                      margin: const EdgeInsets.all(4.0),
-                                      child: Material(
-                                        color: Color(0xFFF28F3B),
+            (provider.allSites.length < 1)
+                ? Container(
+                    height: 120,
+                    margin: EdgeInsets.symmetric(vertical: 8),
+                    width: MediaQuery.of(context).size.width,
+                    child: ListView.builder(
+                        primary: false,
+                        shrinkWrap: true,
+                        scrollDirection: Axis.horizontal,
+                        itemCount: 5,
+                        itemBuilder: (context, i) {
+                          return Shimmer.fromColors(
+                            baseColor: Colors.grey.shade300,
+                            highlightColor: Colors.grey.shade50,
+                            child: Column(
+                              children: [
+                                Container(
+                                  margin: const EdgeInsets.all(4.0),
+                                  child: Material(
+                                    color: Color(0xFFF28F3B),
+                                    borderRadius: BorderRadius.circular(20),
+                                    child: InkWell(
+                                        onTap: () {},
                                         borderRadius: BorderRadius.circular(20),
-                                        child: InkWell(
-                                            onTap: () {},
-                                            borderRadius:
-                                                BorderRadius.circular(20),
-                                            child: SizedBox(
-                                              height: 80,
-                                              width: 80,
-                                              child: Container(
-                                                alignment: Alignment.center,
-                                                child: Text(
-                                                  '',
-                                                  style: GoogleFonts.roboto(
-                                                      fontSize: 40,
-                                                      color: Colors.white),
-                                                ),
-                                              ),
-                                            )),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }),
-                      );
-                    default:
-                      sites = snapshot
-                          .data; //do i need to check isActive? seem unnecessary
-                      if (sites.length > 0) currentSite = sites.first;
-
-                      return Container(
-                        height: 120,
-                        margin: EdgeInsets.symmetric(vertical: 8),
-                        width: MediaQuery.of(context).size.width,
-                        child: ListView.builder(
-                            primary: false,
-                            shrinkWrap: true,
-                            scrollDirection: Axis.horizontal,
-                            itemCount: sites.length + 1,
-                            itemBuilder: (context, i) {
-                              if (i == sites.length)
-                                return Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Material(
-                                        color: Colors.grey,
-                                        borderRadius: BorderRadius.circular(20),
-                                        child: InkWell(
-                                            onTap: () {
-                                              newSite(context);
-                                            },
-                                            borderRadius:
-                                                BorderRadius.circular(20),
-                                            child: SizedBox(
-                                              height: 80,
-                                              width: 80,
-                                              child: Container(
-                                                alignment: Alignment.center,
-                                                child: Text(
-                                                  '+ ',
-                                                  textAlign: TextAlign.center,
-                                                  style: GoogleFonts.roboto(
-                                                      fontSize: 40,
-                                                      color: Colors.white),
-                                                ),
-                                              ),
-                                            )),
-                                      ),
-                                    ],
+                                        child: SizedBox(
+                                          height: 80,
+                                          width: 80,
+                                          child: Container(
+                                            alignment: Alignment.center,
+                                            child: Text(
+                                              '',
+                                              style: GoogleFonts.roboto(
+                                                  fontSize: 40,
+                                                  color: Colors.white),
+                                            ),
+                                          ),
+                                        )),
                                   ),
-                                );
-                              else
-                                return SiteWidget(
-                                  site: sites[i],
-                                  onTap: (cs) {
+                                ),
+                              ],
+                            ),
+                          );
+                        }),
+                  )
+                : Container(
+                    height: 120,
+                    margin: EdgeInsets.symmetric(vertical: 8),
+                    width: MediaQuery.of(context).size.width,
+                    child: ListView.builder(
+                        primary: false,
+                        shrinkWrap: true,
+                        scrollDirection: Axis.horizontal,
+                        itemCount: provider.allSites.length + 1,
+                        itemBuilder: (context, i) {
+                          if (i == provider.allSites.length)
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Material(
+                                    color: Colors.grey,
+                                    borderRadius: BorderRadius.circular(20),
+                                    child: InkWell(
+                                        onTap: () {
+                                          newSite(context);
+                                        },
+                                        borderRadius: BorderRadius.circular(20),
+                                        child: SizedBox(
+                                          height: 80,
+                                          width: 80,
+                                          child: Container(
+                                            alignment: Alignment.center,
+                                            child: Text(
+                                              '+ ',
+                                              textAlign: TextAlign.center,
+                                              style: GoogleFonts.roboto(
+                                                  fontSize: 40,
+                                                  color: Colors.white),
+                                            ),
+                                          ),
+                                        )),
+                                  ),
+                                ],
+                              ),
+                            );
+                          else
+                            return SiteWidget(
+                                site: provider.allSites[i],
+                                onTap: (cs) {
+                                  setState(() {
                                     currentSite = cs;
-                                  },
-                                );
-                            }),
-                      );
-                  }
-                }),
+                                  });
+                                });
+                        }),
+                  ),
             StreamBuilder<List<FacilitesModel>>(
                 stream: FacilityService().getAllFacilities(),
                 builder: (context, snapshot) {
@@ -182,14 +177,19 @@ class AdminHomePage extends StatelessWidget {
                       );
                     default:
                       List<FacilitesModel> facilities = snapshot.data;
-                      print(snapshot.data.length);
+                      List<FacilitesModel> currentSiteData = [];
+                      for (var item in facilities) {
+                        if (currentSite != null) if (item.site.name
+                            .contains(currentSite.name))
+                          currentSiteData.add(item);
+                      }
                       return Container(
                         height: 700,
                         child: ListView.builder(
                             primary: false,
-                            itemCount: facilities.length + 1,
+                            itemCount: currentSiteData.length + 1,
                             itemBuilder: (context, i) {
-                              if (i == facilities.length)
+                              if (i == currentSiteData.length)
                                 return ListTile(
                                   onTap: () {
                                     newFacility(context);
@@ -345,7 +345,7 @@ class AdminHomePage extends StatelessWidget {
   }
 
   newFacility(context) {
-    SitesModel currentSiteBS = sites.first;
+    SitesModel currentSiteBS = provider.allSites.first;
     TextEditingController controller = TextEditingController();
     showModalBottomSheet(
       context: context,
@@ -380,7 +380,7 @@ class AdminHomePage extends StatelessWidget {
                         padding: const EdgeInsets.all(8.0),
                         child: DropdownButton<SitesModel>(
                             isExpanded: true,
-                            items: sites.map((SitesModel val) {
+                            items: provider.allSites.map((SitesModel val) {
                               return DropdownMenuItem<SitesModel>(
                                 value: val,
                                 child: Text(val.name),
