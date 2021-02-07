@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:skimscope/model/equipment_model.dart';
@@ -85,8 +86,12 @@ class EmployeeHomePage extends StatelessWidget {
             children: [
               OutlinedButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, 'edetails',
-                        arguments: tempEquipment);
+                    FlutterBarcodeScanner.scanBarcode(
+                            "#ff6666", "Cancel", false, ScanMode.DEFAULT)
+                        .then((barcode) {
+                      // Navigator.pushNamed(context, 'edetails',
+                      //     arguments: tempEquipment);
+                    });
                   },
                   child: Padding(
                     padding: EdgeInsets.all(40.0),
