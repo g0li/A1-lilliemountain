@@ -3,7 +3,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:skimscope/model/equipment_model.dart';
+import 'package:skimscope/model/services_model.dart';
+import 'package:skimscope/services/maintenance_service.dart';
 import 'package:skimscope/widgets/service_widget.dart';
 
 class EquipmentDetailPage extends StatelessWidget {
@@ -40,7 +43,7 @@ class EquipmentDetailPage extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pushNamed(context, 'ceservice');
+          Navigator.pushNamed(context, 'ceservice', arguments: equipment);
         },
         backgroundColor: Color(0xFFC8553D),
         child: FaIcon(
@@ -104,20 +107,58 @@ class EquipmentDetailPage extends StatelessWidget {
                       color: Color(0xFF5C5C5C),
                       fontSize: 12,
                       fontWeight: FontWeight.w500)),
-              Divider(),
-              Text('history',
-                  style: GoogleFonts.roboto().copyWith(
-                      color: Color(0xFF5C5C5C),
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500)),
-              ListView.separated(
-                shrinkWrap: true,
-                primary: false,
-                itemBuilder: (context, i) => ServiceWidget(),
-                itemCount: 5,
-                separatorBuilder: (BuildContext context, int index) =>
-                    Divider(),
-              )
+              StreamBuilder<List<ServicesModel>>(
+                  stream: MaintenanceService()
+                      .getEquipmentServices(equipmentId: equipment.id),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError)
+                      return Text(snapshot.error.toString());
+                    switch (snapshot.connectionState) {
+                      case ConnectionState.waiting:
+                        return ListView.separated(
+                          shrinkWrap: true,
+                          primary: false,
+                          physics: NeverScrollableScrollPhysics(),
+                          itemBuilder: (context, i) => Shimmer.fromColors(
+                              baseColor: Colors.grey.shade300,
+                              highlightColor: Colors.grey.shade50,
+                              child: Container(
+                                height: 100,
+                                width: MediaQuery.of(context).size.width,
+                              )),
+                          itemCount: 5,
+                          separatorBuilder: (BuildContext context, int index) =>
+                              Divider(),
+                        );
+                        break;
+                      default:
+                        List<ServicesModel> history = snapshot.data;
+
+                        return history.length > 0
+                            ? Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Divider(),
+                                  Text('history',
+                                      style: GoogleFonts.roboto().copyWith(
+                                          color: Color(0xFF5C5C5C),
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w500)),
+                                  ListView.separated(
+                                    shrinkWrap: true,
+                                    primary: false,
+                                    itemBuilder: (context, i) =>
+                                        ServiceWidget(),
+                                    itemCount: history.length,
+                                    separatorBuilder:
+                                        (BuildContext context, int index) =>
+                                            Divider(),
+                                  ),
+                                ],
+                              )
+                            : Container();
+                    }
+                  })
             ],
           ),
         ),

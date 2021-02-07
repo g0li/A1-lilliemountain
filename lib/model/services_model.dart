@@ -5,7 +5,7 @@ class ServicesModel {
   final String id;
   final String equipmentId;
   final String title;
-  final DateTime startDate;
+  final Timestamp startDate;
   final DateTime endDate;
   final FacilitesModel facility;
   final String notes;
@@ -32,10 +32,10 @@ class ServicesModel {
 
     return ServicesModel(
       id: id,
-      equipmentId: data['equipmentId'],
+      equipmentId: data['equipmentId'] ?? '',
       title: data['title'],
       startDate: data['startDate'],
-      endDate: data['endDate'],
+      endDate: data['endDate'] ?? null,
       facility: FacilitesModel.fromJSON(data['facility']),
       createdBy: data['createdBy'],
       notes: data['notes'],
@@ -50,7 +50,7 @@ class ServicesModel {
       'title': service.title,
       'startDate': service.startDate,
       'endDate': service.endDate,
-      'facility': service.facility,
+      'facility': FacilitesModel.facilityToJSon(service.facility),
       'createdBy': service.createdBy,
       'notes': service.notes,
       'whenCreated': service.whenCreated,

@@ -12,7 +12,7 @@ class MaintenanceService {
     @required String title,
     @required DateTime startDate,
     @required DateTime endDate,
-    @required FacilitesModel facility,
+    @required dynamic facility,
     @required String createdBy,
     @required String notes,
     String mode = 'create',
@@ -22,7 +22,7 @@ class MaintenanceService {
       ServicesModel service = ServicesModel(
         equipmentId: equipmentId,
         title: title,
-        startDate: startDate,
+        startDate: Timestamp.fromDate(startDate),
         endDate: endDate,
         facility: facility,
         createdBy: createdBy,
@@ -44,6 +44,7 @@ class MaintenanceService {
         });
       } else {
         // create mode
+        print('this');
         await db
             .collection('equipments/$equipmentId/services')
             .add(ServicesModel.servicesToJSON(service));

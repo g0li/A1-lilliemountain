@@ -58,7 +58,7 @@ class MyApp extends StatelessWidget {
                       ));
             case 'ceservice':
               return CupertinoPageRoute(
-                  builder: (_) => CreateEditServicePage());
+                  builder: (_) => CreateEditServicePage(settings.arguments));
             case 'employee':
               return CupertinoPageRoute(builder: (_) => EmployeePage());
             case 'employeeH':
