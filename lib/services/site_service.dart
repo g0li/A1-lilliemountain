@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:skimscope/model/sites_model.dart';
 
 class SiteService {
   var db = FirebaseFirestore.instance;
+  var firebaseAuth = FirebaseAuth.instance;
 
   // create site
   Future<bool> createSite({
@@ -51,6 +53,10 @@ class SiteService {
       var siteRef = db
           .collection('sites')
           .orderBy('whenCreated', descending: true)
+          .where(
+            'createdBy',
+            isEqualTo: firebaseAuth.currentUser.uid,
+          )
           .snapshots();
       var list = siteRef.map(
           (d) => d.docs.map((doc) => SitesModel.fromFirestore(doc)).toList());
