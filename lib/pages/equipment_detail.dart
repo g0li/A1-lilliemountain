@@ -3,10 +3,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:skimscope/model/equipment_model.dart';
 import 'package:skimscope/model/services_model.dart';
+import 'package:skimscope/providers/user_provider.dart';
 import 'package:skimscope/services/equipment_service.dart';
 import 'package:skimscope/services/maintenance_service.dart';
 import 'package:skimscope/widgets/api_loader.dart';
@@ -30,6 +32,7 @@ class _EquipmentDetailPageState extends State<EquipmentDetailPage>
 
   @override
   Widget build(BuildContext context) {
+    var userProvider = Provider.of<UserProvider>(context);
     return Scaffold(
       key: edKey,
       appBar: AppBar(
@@ -68,7 +71,9 @@ class _EquipmentDetailPageState extends State<EquipmentDetailPage>
           IconButton(
             icon: FaIcon(FontAwesomeIcons.home),
             onPressed: () {
-              // Navigator.pushNamed(context, 'employee');
+              Navigator.of(context).pushNamedAndRemoveUntil(
+                  userProvider.user.role == 'Admin' ? 'admin' : 'employeeH',
+                  (route) => false);
             },
           ),
           IconButton(

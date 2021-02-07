@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:skimscope/providers/user_provider.dart';
 import 'package:skimscope/widgets/employee_widget.dart';
 import 'package:skimscope/widgets/service_widget.dart';
 
@@ -13,6 +15,7 @@ class _HistoryPageState extends State<HistoryPage> {
   List<String> sites = ['Please choose a site', 'A', 'B', 'C', 'D'];
   @override
   Widget build(BuildContext context) {
+    var userProvider = Provider.of<UserProvider>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text('History'),
@@ -20,7 +23,9 @@ class _HistoryPageState extends State<HistoryPage> {
           IconButton(
             icon: FaIcon(FontAwesomeIcons.home),
             onPressed: () {
-              // Navigator.pushNamed(context, 'employee');
+              Navigator.of(context).pushNamedAndRemoveUntil(
+                  userProvider.user.role == 'Admin' ? 'admin' : 'employeeH',
+                  (route) => false);
             },
           )
         ],

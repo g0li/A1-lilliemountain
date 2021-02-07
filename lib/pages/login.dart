@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:skimscope/providers/user_provider.dart';
 import 'package:skimscope/services/auth_service.dart';
 import 'package:skimscope/widgets/api_loader.dart';
 import 'package:skimscope/widgets/input_formfield_widget.dart';
@@ -98,17 +100,17 @@ class _LoginPageState extends State<LoginPage> {
                                   // Navigator.pushNamed(context, 'admin');
                                 },
                               )),
-                          Container(
-                              width: MediaQuery.of(context).size.width,
-                              padding: EdgeInsets.all(8),
-                              child: CupertinoButton(
-                                color: Theme.of(context).primaryColor,
-                                borderRadius: BorderRadius.circular(30),
-                                child: Text('Temp Sign In Employee'),
-                                onPressed: () {
-                                  Navigator.pushNamed(context, 'employeeH');
-                                },
-                              )),
+                          // Container(
+                          //     width: MediaQuery.of(context).size.width,
+                          //     padding: EdgeInsets.all(8),
+                          //     child: CupertinoButton(
+                          //       color: Theme.of(context).primaryColor,
+                          //       borderRadius: BorderRadius.circular(30),
+                          //       child: Text('Temp Sign In Employee'),
+                          //       onPressed: () {
+                          //         Navigator.pushNamed(context, 'employeeH');
+                          //       },
+                          //     )),
                           CupertinoButton(
                             onPressed: () {
                               Navigator.pushNamed(context, 'register');
@@ -158,7 +160,15 @@ class _LoginPageState extends State<LoginPage> {
     if (response != 'Login Successful') {
       this.showToast(response);
     } else {
-      Navigator.pushNamed(context, 'admin');
+      var userProvider = Provider.of<UserProvider>(context, listen: false);
+      if (userProvider.user != null && userProvider.user.role == 'Admin') {
+        Navigator.pushNamed(context, 'admin');
+      } else if (userProvider.user != null &&
+          userProvider.user.role == 'Employee') {
+        Navigator.pushNamed(context, 'employeeH');
+      } else {
+        return;
+      }
     }
   }
 
