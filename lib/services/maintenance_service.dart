@@ -1,7 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:skimscope/model/equipment_model.dart';
 import 'package:skimscope/model/facilities_model.dart';
 import 'package:skimscope/model/services_model.dart';
+import 'package:skimscope/services/equipment_service.dart';
 
 class MaintenanceService {
   var db = FirebaseFirestore.instance;
@@ -71,6 +74,29 @@ class MaintenanceService {
       var list = servicesRef.map((d) =>
           d.docs.map((doc) => ServicesModel.fromFirestore(doc)).toList());
       return list;
+    } catch (err) {
+      print(err.toString());
+      return null;
+    }
+  }
+
+  // get all mt equipment services
+  Future<List<ServicesModel>> getMyServices() async {
+    try {
+      List<ServicesModel> data = [];
+      var equipmentRef = db.collection('equipments').get();
+      var list = await (equipmentRef.then((d) =>
+          d.docs.map((doc) => EquipmentModel.fromFirestore(doc)).toList()));
+      for (var item in list) {
+        var servicesRef = await db
+            .collection('equipments/${item.id}/services')
+            .orderBy('whenCreated', descending: true)
+            .get();
+        servicesRef.docs
+            .map((e) => data.add(ServicesModel.fromFirestoreQ(e)))
+            .toList();
+      }
+      return (data);
     } catch (err) {
       print(err.toString());
       return null;

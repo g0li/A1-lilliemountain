@@ -47,6 +47,24 @@ class ServicesModel {
     );
   }
 
+  factory ServicesModel.fromFirestoreQ(QueryDocumentSnapshot doc) {
+    var id = doc.id;
+    var data = doc.data();
+    return ServicesModel(
+      id: id,
+      equipmentId: data['equipmentId'] ?? '',
+      equipmentName: data['equipmentName'] ?? '',
+      title: data['title'],
+      startDate: data['startDate'],
+      endDate: data['endDate'] ?? null,
+      facility: FacilitesModel.fromJSON(data['facility']),
+      createdBy: data['createdBy'],
+      notes: data['notes'],
+      whenCreated: data['whenCreated'],
+      whenModified: data['whenModified'] ?? null,
+    );
+  }
+
   static Map<String, dynamic> servicesToJSON(ServicesModel service) {
     return {
       'equipmentId': service.equipmentId,

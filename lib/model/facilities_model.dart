@@ -38,7 +38,7 @@ class FacilitesModel {
   // from JSON
   factory FacilitesModel.fromJSON(Map<String, dynamic> data) {
     return FacilitesModel(
-      id: data['id'],
+      id: data['id'] ?? '',
       name: data['name'],
       isActive: data['isActive'],
       site: SitesModel.fromJSON(data['site']),
