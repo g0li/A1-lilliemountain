@@ -6,10 +6,12 @@ import 'package:skimscope/model/equipment_model.dart';
 import 'package:skimscope/model/facilities_model.dart';
 import 'package:skimscope/model/sites_model.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class EquipmentService {
   var db = FirebaseFirestore.instance;
   var storage = FirebaseStorage.instance;
+  var firebaseAuth = FirebaseAuth.instance;
 
   // create equipment
   Future<bool> createEquipment({
@@ -72,11 +74,28 @@ class EquipmentService {
   }
 
   // get all equipments
-  Stream<List<EquipmentModel>> getAllEquipments() {
+  Stream<List<EquipmentModel>> getAllEquipments(
+      {@required String facilityName, @required String createdBy}) {
     try {
-      var equipmentRef = db.collection('equipments').snapshots();
-      var list = equipmentRef.map((d) =>
-          d.docs.map((doc) => EquipmentModel.fromFirestore(doc)).toList());
+      var equipmentRef = db
+          .collection('equipments')
+          .where(
+            'createdBy',
+            isEqualTo: firebaseAuth.currentUser.uid,
+          )
+          .snapshots();
+      var list = equipmentRef.map((d) {
+        var list = d.docs;
+        if (list != null && list.length > 0) {
+          list = list
+              .where((it) => (it['facilityId']['name'] == facilityName &&
+                  it['facilityId']['createdBy'] == createdBy))
+              .toList();
+          return list.map((doc) => EquipmentModel.fromFirestore(doc)).toList();
+        } else {
+          return null;
+        }
+      });
       return list;
     } catch (err) {
       print(err.toString());

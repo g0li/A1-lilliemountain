@@ -49,11 +49,22 @@ class FacilityService {
   }
 
   // get all facilities
-  Stream<List<FacilitesModel>> getAllFacilities() {
+  Stream<List<FacilitesModel>> getAllFacilities(
+      {@required String siteName, @required String createdBy}) {
     try {
       var facilitiesRef = db.collection('facilities').snapshots();
-      var list = facilitiesRef.map((d) =>
-          d.docs.map((doc) => FacilitesModel.fromFirestore(doc)).toList());
+      var list = facilitiesRef.map((d) {
+        var list = d.docs;
+        if (list != null && list.length > 0) {
+          list = list
+              .where((it) => (it['site']['name'] == siteName &&
+                  it['site']['createdBy'] == createdBy))
+              .toList();
+          return list.map((doc) => FacilitesModel.fromFirestore(doc)).toList();
+        } else {
+          return null;
+        }
+      });
       return list;
     } catch (err) {
       print(err.toString());

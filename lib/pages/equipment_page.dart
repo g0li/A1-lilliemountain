@@ -299,219 +299,161 @@ class EquipmentPage extends StatelessWidget {
         body: SingleChildScrollView(
             child: Container(
           child: StreamBuilder<List<EquipmentModel>>(
-              stream: EquipmentService().getAllEquipments(),
+              stream: EquipmentService().getAllEquipments(
+                createdBy: currentFacility.createdBy,
+                facilityName: currentFacility.name,
+              ),
               builder: (context, snapshot) {
                 if (snapshot.hasError) return Text('Something went wrong');
                 switch (snapshot.connectionState) {
                   case ConnectionState.waiting:
                     return Container(
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        primary: false,
-                        itemBuilder: (context, i) => Shimmer.fromColors(
-                          baseColor: Colors.grey.shade300,
-                          highlightColor: Colors.grey.shade50,
-                          child: ListTile(
-                            contentPadding: EdgeInsets.symmetric(
-                                vertical: 16, horizontal: 8),
-                            title: Text(
-                              'asdasd',
-                              style: GoogleFonts.roboto()
-                                  .copyWith(color: Colors.black, fontSize: 12),
-                            ),
+                        child: ListView.builder(
+                      shrinkWrap: true,
+                      primary: false,
+                      itemBuilder: (context, i) => Shimmer.fromColors(
+                        baseColor: Colors.grey.shade300,
+                        highlightColor: Colors.grey.shade50,
+                        child: ListTile(
+                          contentPadding:
+                              EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+                          title: Text(
+                            'asdasd',
+                            style: GoogleFonts.roboto()
+                                .copyWith(color: Colors.black, fontSize: 12),
                           ),
                         ),
-                        itemCount: 10,
-                        physics: NeverScrollableScrollPhysics(),
                       ),
-                    );
+                      itemCount: 10,
+                      physics: NeverScrollableScrollPhysics(),
+                    ));
 
                     break;
                   default:
                     List<EquipmentModel> equipments = snapshot.data;
                     return StatefulBuilder(
                       builder: (context, setstate) {
-                        return ExpansionPanelList(
-                          expansionCallback: (int index, bool isExpanded) {
-                            setstate(() {
-                              equipments[index].isExpanded = !isExpanded;
-                            });
-                          },
-                          children: equipments
-                              .map<ExpansionPanel>((EquipmentModel item) {
-                            return ExpansionPanel(
-                              headerBuilder:
-                                  (BuildContext context, bool isExpanded) {
-                                return ListTile(
-                                  onTap: () {
-                                    setstate(() {
-                                      equipments[equipments.indexOf(item)]
-                                          .isExpanded = !isExpanded;
-                                    });
-                                  },
-                                  contentPadding: EdgeInsets.symmetric(
-                                      vertical: 16, horizontal: 8),
-                                  title: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        item.srNo,
-                                        style: GoogleFonts.roboto().copyWith(
-                                            color: Colors.black, fontSize: 12),
-                                      ),
-                                      Text(item.name,
-                                          style: GoogleFonts.roboto().copyWith(
-                                              color: Colors.black,
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w500)),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(
-                                              '${item.siteId.name} / ${item.facilityId.name}',
+                        return (snapshot.data != null &&
+                                snapshot.data.length > 0)
+                            ? ExpansionPanelList(
+                                expansionCallback:
+                                    (int index, bool isExpanded) {
+                                  setstate(() {
+                                    equipments[index].isExpanded = !isExpanded;
+                                  });
+                                },
+                                children: equipments
+                                    .map<ExpansionPanel>((EquipmentModel item) {
+                                  return ExpansionPanel(
+                                    headerBuilder: (BuildContext context,
+                                        bool isExpanded) {
+                                      return ListTile(
+                                        onTap: () {
+                                          setstate(() {
+                                            equipments[equipments.indexOf(item)]
+                                                .isExpanded = !isExpanded;
+                                          });
+                                        },
+                                        contentPadding: EdgeInsets.symmetric(
+                                            vertical: 16, horizontal: 8),
+                                        title: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              item.srNo,
                                               style: GoogleFonts.roboto()
                                                   .copyWith(
-                                                      color: Color(0xFF5C5C5C),
-                                                      fontSize: 12,
-                                                      fontWeight:
-                                                          FontWeight.w500)),
-                                          Text(
-                                              'doi :${(item.installationDate as Timestamp).toDate().toString().split(' ')[0]}',
-                                              style: GoogleFonts.roboto()
-                                                  .copyWith(
-                                                      color: Color(0xFF5C5C5C),
-                                                      fontSize: 12,
-                                                      fontWeight:
-                                                          FontWeight.w500)),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
-                              body: StreamBuilder<List<ServicesModel>>(
-                                  stream: MaintenanceService()
-                                      .getEquipmentServices(
-                                          equipmentId: item.id),
-                                  builder: (context, snapshotB) {
-                                    if (snapshotB.hasError)
-                                      return Text('Something went wrong');
-                                    switch (snapshotB.connectionState) {
-                                      case ConnectionState.waiting:
-                                        return Shimmer.fromColors(
-                                            child: ListTile(),
-                                            baseColor: Colors.grey.shade300,
-                                            highlightColor:
-                                                Colors.grey.shade50);
-                                        break;
-                                      default:
-                                        List<ServicesModel> data =
-                                            snapshotB.data;
-                                        ServicesModel last;
-                                        try {
-                                          last = snapshotB.data.lastWhere(
-                                              (element) =>
-                                                  element.endDate != null);
-                                        } catch (e) {
-                                          last = null;
-                                        }
-                                        int lastIndex =
-                                            snapshotB.data.lastIndexOf(
-                                          last,
-                                        );
-                                        return ListTile(
-                                          contentPadding: EdgeInsets.symmetric(
-                                              vertical: 8, horizontal: 8),
-                                          title: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Padding(
-                                                padding: EdgeInsets.symmetric(
-                                                    vertical: 8),
-                                                child: Row(
+                                                      color: Colors.black,
+                                                      fontSize: 12),
+                                            ),
+                                            Text(item.name,
+                                                style: GoogleFonts.roboto()
+                                                    .copyWith(
+                                                        color: Colors.black,
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.w500)),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(
+                                                    '${item.siteId.name} / ${item.facilityId.name}',
+                                                    style: GoogleFonts.roboto()
+                                                        .copyWith(
+                                                            color: Color(
+                                                                0xFF5C5C5C),
+                                                            fontSize: 12,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w500)),
+                                                Text(
+                                                    'doi :${(item.installationDate as Timestamp).toDate().toString().split(' ')[0]}',
+                                                    style: GoogleFonts.roboto()
+                                                        .copyWith(
+                                                            color: Color(
+                                                                0xFF5C5C5C),
+                                                            fontSize: 12,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w500)),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                    body: StreamBuilder<List<ServicesModel>>(
+                                        stream: MaintenanceService()
+                                            .getEquipmentServices(
+                                                equipmentId: item.id),
+                                        builder: (context, snapshotB) {
+                                          if (snapshotB.hasError)
+                                            return Text('Something went wrong');
+                                          switch (snapshotB.connectionState) {
+                                            case ConnectionState.waiting:
+                                              return Shimmer.fromColors(
+                                                  child: ListTile(),
+                                                  baseColor:
+                                                      Colors.grey.shade300,
+                                                  highlightColor:
+                                                      Colors.grey.shade50);
+                                              break;
+                                            default:
+                                              List<ServicesModel> data =
+                                                  snapshotB.data;
+                                              ServicesModel last;
+                                              try {
+                                                last = snapshotB.data.lastWhere(
+                                                    (element) =>
+                                                        element.endDate !=
+                                                        null);
+                                              } catch (e) {
+                                                last = null;
+                                              }
+                                              int lastIndex =
+                                                  snapshotB.data.lastIndexOf(
+                                                last,
+                                              );
+                                              return ListTile(
+                                                contentPadding:
+                                                    EdgeInsets.symmetric(
+                                                        vertical: 8,
+                                                        horizontal: 8),
+                                                title: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
                                                   children: [
-                                                    Text(
-                                                        'service since installation :',
-                                                        style:
-                                                            GoogleFonts.roboto()
-                                                                .copyWith(
-                                                          color:
-                                                              Color(0xFF5C5C5C),
-                                                          fontSize: 12,
-                                                        )),
-                                                    Text(
-                                                        (lastIndex + 1)
-                                                            .toString(),
-                                                        style:
-                                                            GoogleFonts.roboto()
-                                                                .copyWith(
-                                                          color: Colors.black,
-                                                          fontSize: 14,
-                                                        )),
-                                                  ],
-                                                ),
-                                              ),
-                                              last != null
-                                                  ? Padding(
+                                                    Padding(
                                                       padding:
                                                           EdgeInsets.symmetric(
                                                               vertical: 8),
                                                       child: Row(
                                                         children: [
                                                           Text(
-                                                              'last service by :',
-                                                              style: GoogleFonts
-                                                                      .roboto()
-                                                                  .copyWith(
-                                                                color: Color(
-                                                                    0xFF5C5C5C),
-                                                                fontSize: 12,
-                                                              )),
-                                                          StreamBuilder<
-                                                                  UserModel>(
-                                                              stream: AuthService()
-                                                                  .getUser(last
-                                                                      .createdBy),
-                                                              builder: (context,
-                                                                  snapshot) {
-                                                                if (snapshot
-                                                                    .hasError)
-                                                                  return Text(
-                                                                      'NA');
-                                                                switch (snapshot
-                                                                    .connectionState) {
-                                                                  case ConnectionState
-                                                                      .waiting:
-                                                                    return Container();
-                                                                  default:
-                                                                    return Text(
-                                                                        snapshot
-                                                                            .data
-                                                                            .name,
-                                                                        style: GoogleFonts.roboto().copyWith(
-                                                                            color: Color(
-                                                                                0xFF5C5C5C),
-                                                                            fontSize:
-                                                                                12,
-                                                                            fontWeight:
-                                                                                FontWeight.w500));
-                                                                }
-                                                              }),
-                                                        ],
-                                                      ),
-                                                    )
-                                                  : Container(),
-                                              last != null
-                                                  ? Padding(
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              vertical: 8),
-                                                      child: Row(
-                                                        children: [
-                                                          Text('service date: ',
+                                                              'service since installation :',
                                                               style: GoogleFonts
                                                                       .roboto()
                                                                   .copyWith(
@@ -520,11 +462,8 @@ class EquipmentPage extends StatelessWidget {
                                                                 fontSize: 12,
                                                               )),
                                                           Text(
-                                                              last.endDate
-                                                                  .toDate()
-                                                                  .toString()
-                                                                  .split(
-                                                                      ' ')[0],
+                                                              (lastIndex + 1)
+                                                                  .toString(),
                                                               style: GoogleFonts
                                                                       .roboto()
                                                                   .copyWith(
@@ -534,60 +473,148 @@ class EquipmentPage extends StatelessWidget {
                                                               )),
                                                         ],
                                                       ),
+                                                    ),
+                                                    last != null
+                                                        ? Padding(
+                                                            padding: EdgeInsets
+                                                                .symmetric(
+                                                                    vertical:
+                                                                        8),
+                                                            child: Row(
+                                                              children: [
+                                                                Text(
+                                                                    'last service by :',
+                                                                    style: GoogleFonts
+                                                                            .roboto()
+                                                                        .copyWith(
+                                                                      color: Color(
+                                                                          0xFF5C5C5C),
+                                                                      fontSize:
+                                                                          12,
+                                                                    )),
+                                                                StreamBuilder<
+                                                                        UserModel>(
+                                                                    stream: AuthService()
+                                                                        .getUser(last
+                                                                            .createdBy),
+                                                                    builder:
+                                                                        (context,
+                                                                            snapshot) {
+                                                                      if (snapshot
+                                                                          .hasError)
+                                                                        return Text(
+                                                                            'NA');
+                                                                      switch (snapshot
+                                                                          .connectionState) {
+                                                                        case ConnectionState
+                                                                            .waiting:
+                                                                          return Container();
+                                                                        default:
+                                                                          return Text(
+                                                                              snapshot.data.name,
+                                                                              style: GoogleFonts.roboto().copyWith(color: Color(0xFF5C5C5C), fontSize: 12, fontWeight: FontWeight.w500));
+                                                                      }
+                                                                    }),
+                                                              ],
+                                                            ),
+                                                          )
+                                                        : Container(),
+                                                    last != null
+                                                        ? Padding(
+                                                            padding: EdgeInsets
+                                                                .symmetric(
+                                                                    vertical:
+                                                                        8),
+                                                            child: Row(
+                                                              children: [
+                                                                Text(
+                                                                    'service date: ',
+                                                                    style: GoogleFonts
+                                                                            .roboto()
+                                                                        .copyWith(
+                                                                      color: Color(
+                                                                          0xFF5C5C5C),
+                                                                      fontSize:
+                                                                          12,
+                                                                    )),
+                                                                Text(
+                                                                    last.endDate
+                                                                        .toDate()
+                                                                        .toString()
+                                                                        .split(
+                                                                            ' ')[0],
+                                                                    style: GoogleFonts.roboto().copyWith(
+                                                                      color: Colors
+                                                                          .black,
+                                                                      fontSize:
+                                                                          14,
+                                                                    )),
+                                                              ],
+                                                            ),
+                                                          )
+                                                        : Container(),
+                                                    Row(
+                                                      children: [
+                                                        Flexible(
+                                                          fit: FlexFit.tight,
+                                                          flex: 1,
+                                                          child: FlatButton(
+                                                            onPressed: () {
+                                                              showAlertDialog(
+                                                                  context,
+                                                                  item);
+                                                            },
+                                                            child: Text(
+                                                              'DELETE',
+                                                              style: GoogleFonts
+                                                                      .roboto()
+                                                                  .copyWith(
+                                                                color: Color(
+                                                                    0xFFC8553D),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        Flexible(
+                                                          flex: 1,
+                                                          fit: FlexFit.tight,
+                                                          child: FlatButton(
+                                                            onPressed: () {
+                                                              Navigator
+                                                                  .pushNamed(
+                                                                      context,
+                                                                      'edetails',
+                                                                      arguments:
+                                                                          item);
+                                                            },
+                                                            child: Text(
+                                                              'MORE',
+                                                              style: GoogleFonts
+                                                                      .roboto()
+                                                                  .copyWith(
+                                                                color: Color(
+                                                                    0xFFC8553D),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
                                                     )
-                                                  : Container(),
-                                              Row(
-                                                children: [
-                                                  Flexible(
-                                                    fit: FlexFit.tight,
-                                                    flex: 1,
-                                                    child: FlatButton(
-                                                      onPressed: () {
-                                                        showAlertDialog(
-                                                            context, item);
-                                                      },
-                                                      child: Text(
-                                                        'DELETE',
-                                                        style:
-                                                            GoogleFonts.roboto()
-                                                                .copyWith(
-                                                          color:
-                                                              Color(0xFFC8553D),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  Flexible(
-                                                    flex: 1,
-                                                    fit: FlexFit.tight,
-                                                    child: FlatButton(
-                                                      onPressed: () {
-                                                        Navigator.pushNamed(
-                                                            context, 'edetails',
-                                                            arguments: item);
-                                                      },
-                                                      child: Text(
-                                                        'MORE',
-                                                        style:
-                                                            GoogleFonts.roboto()
-                                                                .copyWith(
-                                                          color:
-                                                              Color(0xFFC8553D),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              )
-                                            ],
-                                          ),
-                                        );
-                                    }
-                                  }),
-                              isExpanded: item.isExpanded,
-                            );
-                          }).toList(),
-                        );
+                                                  ],
+                                                ),
+                                              );
+                                          }
+                                        }),
+                                    isExpanded: item.isExpanded,
+                                  );
+                                }).toList(),
+                              )
+                            : SizedBox(
+                                height: 100,
+                                child: Center(
+                                  child: Text('No Equipments created!'),
+                                ),
+                              );
                       },
                     );
                 }

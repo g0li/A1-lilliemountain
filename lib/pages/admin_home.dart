@@ -162,124 +162,135 @@ class _AdminHomePageState extends State<AdminHomePage> {
                                   });
                           }),
                     ),
-              Text(
-                'Facilities',
-                style: GoogleFonts.roboto().copyWith(
-                    fontWeight: FontWeight.w900,
-                    color: Theme.of(context).primaryColor,
-                    fontSize: 24),
-              ),
-              StreamBuilder<List<FacilitesModel>>(
-                  stream: FacilityService().getAllFacilities(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) return Text('Something went wrong');
-                    switch (snapshot.connectionState) {
-                      case ConnectionState.waiting:
-                        return Container(
-                          height: 120,
-                          margin: EdgeInsets.symmetric(vertical: 8),
-                          width: MediaQuery.of(context).size.width,
-                          child: ListView.builder(
-                              primary: false,
-                              shrinkWrap: true,
-                              scrollDirection: Axis.horizontal,
-                              itemCount: 5,
-                              itemBuilder: (context, i) {
-                                return Shimmer.fromColors(
-                                  baseColor: Colors.grey.shade300,
-                                  highlightColor: Colors.grey.shade50,
-                                  child: Container(
-                                    width: MediaQuery.of(context).size.width,
-                                    height: 100,
-                                  ),
-                                );
-                              }),
-                        );
-                      default:
-                        List<FacilitesModel> facilities = snapshot.data;
-                        List<FacilitesModel> currentSiteData = [];
-                        for (var item in facilities) {
-                          if (currentSite != null) if (item.site.name
-                              .contains(currentSite.name))
-                            currentSiteData.add(item);
-                        }
-                        return Container(
-                          height: 700,
-                          child: ListView.builder(
-                              primary: false,
-                              itemCount: currentSiteData.length + 1,
-                              itemBuilder: (context, i) {
-                                if (i == currentSiteData.length)
-                                  return ListTile(
-                                    onTap: () {
-                                      newFacility(context);
-                                    },
-                                    title: Text(
-                                      'new facility',
-                                      style: GoogleFonts.roboto().copyWith(
-                                          color: Theme.of(context).primaryColor,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600),
-                                    ),
-                                    trailing: FaIcon(
-                                      FontAwesomeIcons.plus,
-                                      color: Theme.of(context).primaryColor,
+              if (currentSite != null)
+                Text(
+                  'Facilities',
+                  style: GoogleFonts.roboto().copyWith(
+                      fontWeight: FontWeight.w900,
+                      color: Theme.of(context).primaryColor,
+                      fontSize: 24),
+                ),
+              if (currentSite != null)
+                StreamBuilder<List<FacilitesModel>>(
+                    stream: FacilityService().getAllFacilities(
+                      siteName: currentSite.name,
+                      createdBy: currentSite.createdBy,
+                    ),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasError) {
+                        print(snapshot.error.toString());
+                        return Text('Something went wrong');
+                      }
+                      switch (snapshot.connectionState) {
+                        case ConnectionState.waiting:
+                          return Container(
+                            height: 120,
+                            margin: EdgeInsets.symmetric(vertical: 8),
+                            width: MediaQuery.of(context).size.width,
+                            child: ListView.builder(
+                                primary: false,
+                                shrinkWrap: true,
+                                scrollDirection: Axis.horizontal,
+                                itemCount: 5,
+                                itemBuilder: (context, i) {
+                                  return Shimmer.fromColors(
+                                    baseColor: Colors.grey.shade300,
+                                    highlightColor: Colors.grey.shade50,
+                                    child: Container(
+                                      width: MediaQuery.of(context).size.width,
+                                      height: 100,
                                     ),
                                   );
-                                else
-                                  return ListTile(
-                                    onTap: () {
-                                      Navigator.pushNamed(context, 'equipment',
-                                          arguments: currentSiteData[i]);
-                                    },
-                                    title: Text(
-                                      currentSiteData[i].name,
-                                      style: GoogleFonts.roboto().copyWith(
-                                          color: Colors.black,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500),
-                                    ),
-                                    subtitle: StreamBuilder<int>(
-                                        stream: EquipmentService()
-                                            .getEquipmentCount(
-                                                currentSiteData[i]),
-                                        builder: (context, snapshotI) {
-                                          if (snapshotI.hasError)
-                                            return Text('');
-                                          switch (snapshotI.connectionState) {
-                                            case ConnectionState.waiting:
-                                              return Shimmer.fromColors(
-                                                child: Text(
-                                                  'equipment count :',
+                                }),
+                          );
+                        default:
+                          List<FacilitesModel> facilities = snapshot.data;
+                          List<FacilitesModel> currentSiteData = [];
+                          for (var item in facilities) {
+                            if (currentSite != null) if (item.site.name
+                                .contains(currentSite.name))
+                              currentSiteData.add(item);
+                          }
+                          return Container(
+                            height: 700,
+                            child: ListView.builder(
+                                primary: false,
+                                itemCount: currentSiteData.length + 1,
+                                itemBuilder: (context, i) {
+                                  if (i == currentSiteData.length)
+                                    return ListTile(
+                                      onTap: () {
+                                        newFacility(context);
+                                      },
+                                      title: Text(
+                                        'new facility',
+                                        style: GoogleFonts.roboto().copyWith(
+                                            color:
+                                                Theme.of(context).primaryColor,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600),
+                                      ),
+                                      trailing: FaIcon(
+                                        FontAwesomeIcons.plus,
+                                        color: Theme.of(context).primaryColor,
+                                      ),
+                                    );
+                                  else
+                                    return ListTile(
+                                      onTap: () {
+                                        Navigator.pushNamed(
+                                            context, 'equipment',
+                                            arguments: currentSiteData[i]);
+                                      },
+                                      title: Text(
+                                        currentSiteData[i].name,
+                                        style: GoogleFonts.roboto().copyWith(
+                                            color: Colors.black,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w500),
+                                      ),
+                                      subtitle: StreamBuilder<int>(
+                                          stream: EquipmentService()
+                                              .getEquipmentCount(
+                                                  currentSiteData[i]),
+                                          builder: (context, snapshotI) {
+                                            if (snapshotI.hasError)
+                                              return Text('');
+                                            switch (snapshotI.connectionState) {
+                                              case ConnectionState.waiting:
+                                                return Shimmer.fromColors(
+                                                  child: Text(
+                                                    'equipment count :',
+                                                    style: GoogleFonts.roboto()
+                                                        .copyWith(
+                                                            color: Colors.black,
+                                                            fontSize: 14),
+                                                  ),
+                                                  baseColor:
+                                                      Colors.grey.shade300,
+                                                  highlightColor:
+                                                      Colors.grey.shade50,
+                                                );
+                                                break;
+                                              default:
+                                                return Text(
+                                                  'equipment count : ${snapshotI.data}',
                                                   style: GoogleFonts.roboto()
                                                       .copyWith(
                                                           color: Colors.black,
                                                           fontSize: 14),
-                                                ),
-                                                baseColor: Colors.grey.shade300,
-                                                highlightColor:
-                                                    Colors.grey.shade50,
-                                              );
-                                              break;
-                                            default:
-                                              return Text(
-                                                'equipment count : ${snapshotI.data}',
-                                                style: GoogleFonts.roboto()
-                                                    .copyWith(
-                                                        color: Colors.black,
-                                                        fontSize: 14),
-                                              );
-                                          }
-                                        }),
-                                    trailing: FaIcon(
-                                      FontAwesomeIcons.chevronRight,
-                                      color: Colors.black,
-                                    ),
-                                  );
-                              }),
-                        );
-                    }
-                  })
+                                                );
+                                            }
+                                          }),
+                                      trailing: FaIcon(
+                                        FontAwesomeIcons.chevronRight,
+                                        color: Colors.black,
+                                      ),
+                                    );
+                                }),
+                          );
+                      }
+                    })
             ],
           ),
         )),
@@ -336,10 +347,12 @@ class _AdminHomePageState extends State<AdminHomePage> {
                             if (siteFormKey.currentState.validate()) {
                               SiteService()
                                   .createSite(
-                                      name: controller.text,
-                                      createdBy:
-                                          FirebaseAuth.instance.currentUser.uid)
+                                name: controller.text,
+                                createdBy:
+                                    FirebaseAuth.instance.currentUser.uid,
+                              )
                                   .then((value) {
+                                print(value);
                                 if (MediaQuery.of(context).viewInsets.bottom !=
                                     0) Navigator.pop(context);
                                 value
