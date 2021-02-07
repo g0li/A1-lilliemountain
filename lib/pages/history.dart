@@ -26,7 +26,8 @@ class _HistoryPageState extends State<HistoryPage> {
         ],
       ),
       body: ListView.separated(
-          itemBuilder: (context, i) => ServiceWidget(),
+          itemBuilder: (context, i) => Container(),
+          // itemBuilder: (context, i) => ServiceWidget(),
           separatorBuilder: (context, i) => Divider(),
           itemCount: 10),
     );

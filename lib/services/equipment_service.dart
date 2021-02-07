@@ -102,4 +102,16 @@ class EquipmentService {
       return null;
     }
   }
+
+  //active deactive equipment
+  Future<void> toggleEquipment(bool toggle, equipmentId) {
+    var docRef = db.doc('equipments/$equipmentId');
+    return docRef.update({'isActive': toggle});
+  }
+
+  //watch equipment status
+  Stream<bool> wathchIsActive(equipmentId) {
+    var docRef = db.doc('equipments/$equipmentId');
+    return docRef.snapshots().map((event) => event.data()['isActive']);
+  }
 }

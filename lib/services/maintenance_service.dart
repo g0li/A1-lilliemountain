@@ -9,6 +9,7 @@ class MaintenanceService {
   // create & edit service
   Future<bool> createService({
     @required String equipmentId,
+    @required String equipmentName,
     @required String title,
     @required DateTime startDate,
     @required DateTime endDate,
@@ -21,9 +22,10 @@ class MaintenanceService {
     try {
       ServicesModel service = ServicesModel(
         equipmentId: equipmentId,
+        equipmentName: equipmentName,
         title: title,
         startDate: Timestamp.fromDate(startDate),
-        endDate: endDate,
+        endDate: Timestamp.fromDate(endDate),
         facility: facility,
         createdBy: createdBy,
         notes: notes,
@@ -38,13 +40,12 @@ class MaintenanceService {
           'title': title,
           'startDate': startDate,
           'endDate': endDate,
-          'facility': facility,
+          'facility': FacilitesModel.facilityToJSon(facility),
           'notes': notes,
           'whenModified': Timestamp.now(),
         });
       } else {
         // create mode
-        print('this');
         await db
             .collection('equipments/$equipmentId/services')
             .add(ServicesModel.servicesToJSON(service));
@@ -62,8 +63,10 @@ class MaintenanceService {
     @required String equipmentId,
   }) {
     try {
-      var servicesRef =
-          db.collection('equipments/$equipmentId/services').snapshots();
+      var servicesRef = db
+          .collection('equipments/$equipmentId/services')
+          .orderBy('whenCreated', descending: true)
+          .snapshots();
       var list = servicesRef.map((d) =>
           d.docs.map((doc) => ServicesModel.fromFirestore(doc)).toList());
       return list;

@@ -11,9 +11,13 @@ import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:skimscope/model/equipment_model.dart';
 import 'package:skimscope/model/facilities_model.dart';
+import 'package:skimscope/model/services_model.dart';
 import 'package:skimscope/model/sites_model.dart';
+import 'package:skimscope/model/user_model.dart';
+import 'package:skimscope/services/auth_service.dart';
 import 'package:skimscope/services/equipment_service.dart';
 import 'package:skimscope/services/facility_service.dart';
+import 'package:skimscope/services/maintenance_service.dart';
 
 class EquipmentPage extends StatelessWidget {
   FacilitesModel currentFacility;
@@ -352,93 +356,151 @@ class EquipmentPage extends StatelessWidget {
                                   ),
                                 );
                               },
-                              body: ListTile(
-                                contentPadding: EdgeInsets.symmetric(
-                                    vertical: 8, horizontal: 8),
-                                title: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Padding(
-                                      padding:
-                                          EdgeInsets.symmetric(vertical: 8),
-                                      child: Row(
-                                        children: [
-                                          Text(
-                                              'service since last installation :',
-                                              style:
-                                                  GoogleFonts.roboto().copyWith(
-                                                color: Color(0xFF5C5C5C),
-                                                fontSize: 12,
-                                              )),
-                                          Text('5',
-                                              style:
-                                                  GoogleFonts.roboto().copyWith(
-                                                color: Colors.black,
-                                                fontSize: 14,
-                                              )),
-                                        ],
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding:
-                                          EdgeInsets.symmetric(vertical: 8),
-                                      child: Row(
-                                        children: [
-                                          Text('last service by :',
-                                              style:
-                                                  GoogleFonts.roboto().copyWith(
-                                                color: Color(0xFF5C5C5C),
-                                                fontSize: 12,
-                                              )),
-                                          Text(' employee name',
-                                              style:
-                                                  GoogleFonts.roboto().copyWith(
-                                                color: Colors.black,
-                                                fontSize: 14,
-                                              )),
-                                        ],
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding:
-                                          EdgeInsets.symmetric(vertical: 8),
-                                      child: Row(
-                                        children: [
-                                          Text('service date:',
-                                              style:
-                                                  GoogleFonts.roboto().copyWith(
-                                                color: Color(0xFF5C5C5C),
-                                                fontSize: 12,
-                                              )),
-                                          Text(' 31/5/2021',
-                                              style:
-                                                  GoogleFonts.roboto().copyWith(
-                                                color: Colors.black,
-                                                fontSize: 14,
-                                              )),
-                                        ],
-                                      ),
-                                    ),
-                                    Align(
-                                      alignment: Alignment.bottomRight,
-                                      child: CupertinoButton(
-                                        onPressed: () {
-                                          Navigator.pushNamed(
-                                              context, 'edetails',
-                                              arguments: item);
-                                        },
-                                        child: Text(
-                                          'MORE',
-                                          style: GoogleFonts.roboto().copyWith(
-                                              color: Color(0xFFC8553D),
-                                              decoration:
-                                                  TextDecoration.underline),
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),
+                              body: StreamBuilder<List<ServicesModel>>(
+                                  stream: MaintenanceService()
+                                      .getEquipmentServices(
+                                          equipmentId: item.id),
+                                  builder: (context, snapshotB) {
+                                    if (snapshotB.hasError)
+                                      return Text('Something went wrong');
+                                    switch (snapshotB.connectionState) {
+                                      case ConnectionState.waiting:
+                                        return Shimmer.fromColors(
+                                            child: ListTile(),
+                                            baseColor: Colors.grey.shade300,
+                                            highlightColor:
+                                                Colors.grey.shade50);
+                                        break;
+                                      default:
+                                        List<ServicesModel> data =
+                                            snapshotB.data;
+                                        return ListTile(
+                                          contentPadding: EdgeInsets.symmetric(
+                                              vertical: 8, horizontal: 8),
+                                          title: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                    vertical: 8),
+                                                child: Row(
+                                                  children: [
+                                                    Text(
+                                                        'service since installation :',
+                                                        style:
+                                                            GoogleFonts.roboto()
+                                                                .copyWith(
+                                                          color:
+                                                              Color(0xFF5C5C5C),
+                                                          fontSize: 12,
+                                                        )),
+                                                    Text(data.length.toString(),
+                                                        style:
+                                                            GoogleFonts.roboto()
+                                                                .copyWith(
+                                                          color: Colors.black,
+                                                          fontSize: 14,
+                                                        )),
+                                                  ],
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                    vertical: 8),
+                                                child: Row(
+                                                  children: [
+                                                    Text('last service by :',
+                                                        style:
+                                                            GoogleFonts.roboto()
+                                                                .copyWith(
+                                                          color:
+                                                              Color(0xFF5C5C5C),
+                                                          fontSize: 12,
+                                                        )),
+                                                    StreamBuilder<UserModel>(
+                                                        stream: AuthService()
+                                                            .getUser(data.last
+                                                                .createdBy),
+                                                        builder: (context,
+                                                            snapshot) {
+                                                          if (snapshot.hasError)
+                                                            return Text('NA');
+                                                          switch (snapshot
+                                                              .connectionState) {
+                                                            case ConnectionState
+                                                                .waiting:
+                                                              return Container();
+                                                            default:
+                                                              return Text(
+                                                                  snapshot.data
+                                                                      .name,
+                                                                  style: GoogleFonts.roboto().copyWith(
+                                                                      color: Color(
+                                                                          0xFF5C5C5C),
+                                                                      fontSize:
+                                                                          12,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w500));
+                                                          }
+                                                        }),
+                                                  ],
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                    vertical: 8),
+                                                child: Row(
+                                                  children: [
+                                                    Text('service date: ',
+                                                        style:
+                                                            GoogleFonts.roboto()
+                                                                .copyWith(
+                                                          color:
+                                                              Color(0xFF5C5C5C),
+                                                          fontSize: 12,
+                                                        )),
+                                                    Text(
+                                                        data.last.endDate
+                                                            .toDate()
+                                                            .toString()
+                                                            .split(' ')[0],
+                                                        style:
+                                                            GoogleFonts.roboto()
+                                                                .copyWith(
+                                                          color: Colors.black,
+                                                          fontSize: 14,
+                                                        )),
+                                                  ],
+                                                ),
+                                              ),
+                                              Align(
+                                                alignment:
+                                                    Alignment.bottomRight,
+                                                child: CupertinoButton(
+                                                  onPressed: () {
+                                                    Navigator.pushNamed(
+                                                        context, 'edetails',
+                                                        arguments: item);
+                                                  },
+                                                  child: Text(
+                                                    'MORE',
+                                                    style: GoogleFonts.roboto()
+                                                        .copyWith(
+                                                            color: Color(
+                                                                0xFFC8553D),
+                                                            decoration:
+                                                                TextDecoration
+                                                                    .underline),
+                                                  ),
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        );
+                                    }
+                                  }),
                               isExpanded: item.isExpanded,
                             );
                           }).toList(),

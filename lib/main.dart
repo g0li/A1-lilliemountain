@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:skimscope/model/equipment_model.dart';
 import 'package:skimscope/pages/admin_home.dart';
 import 'package:skimscope/pages/create_service.dart';
 import 'package:skimscope/pages/employee_home.dart';
@@ -10,6 +11,7 @@ import 'package:skimscope/pages/equipment_detail.dart';
 import 'package:skimscope/pages/equipment_page.dart';
 import 'package:skimscope/pages/history.dart';
 import 'package:skimscope/pages/register.dart';
+import 'package:skimscope/providers/site_provider.dart';
 import 'package:skimscope/providers/user_provider.dart';
 
 import 'pages/employee.dart';
@@ -33,6 +35,9 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(
           create: (ctx) => UserProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (ctx) => SiteProvider(),
         ),
       ],
       child: MaterialApp(
@@ -61,8 +66,17 @@ class MyApp extends StatelessWidget {
                         equipment: settings.arguments,
                       ));
             case 'ceservice':
-              return CupertinoPageRoute(
-                  builder: (_) => CreateEditServicePage(settings.arguments));
+              return CupertinoPageRoute(builder: (_) {
+                if (settings.arguments is EquipmentModel)
+                  return CreateEditServicePage(
+                    equipment: settings.arguments,
+                  );
+                else
+                  return CreateEditServicePage(
+                    servicesModel: settings.arguments,
+                  );
+              });
+
             case 'employee':
               return CupertinoPageRoute(builder: (_) => EmployeePage());
             case 'employeeH':
